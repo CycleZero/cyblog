@@ -7,4 +7,6 @@ var ProviderSet = wire.NewSet(
 	NewCategoryRepo,
 	NewTagRepo,
 	NewArticleRepo,
+	NewCommentLikeRepo,
+	NewCommentRepo,
 )
