@@ -4,6 +4,7 @@ import (
 	"cyblog/internal/domain/article"
 	"cyblog/internal/domain/auth"
 	"cyblog/internal/domain/category"
+	"cyblog/internal/domain/comment"
 	"cyblog/internal/domain/tag"
 	"cyblog/internal/domain/user"
 )
@@ -14,6 +15,7 @@ type ServiceHub struct {
 	CategoryService *category.CategoryService
 	TagService      *tag.TagService
 	ArticleService  *article.ArticleService
+	CommentService  *comment.CommentService
 }
 
 func NewServiceHub(
@@ -22,6 +24,7 @@ func NewServiceHub(
 	categoryService *category.CategoryService,
 	tagService *tag.TagService,
 	articleService *article.ArticleService,
+	commentService *comment.CommentService,
 ) *ServiceHub {
 	return &ServiceHub{
 		AuthService:     authService,
@@ -29,5 +32,6 @@ func NewServiceHub(
 		CategoryService: categoryService,
 		TagService:      tagService,
 		ArticleService:  articleService,
+		CommentService:  commentService,
 	}
 }

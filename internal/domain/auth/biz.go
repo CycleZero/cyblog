@@ -16,14 +16,17 @@ import (
 type AuthBiz struct {
 	userRepo *repo.UserRepo
 	logger   *log.Logger
+	jwtBiz   *JwtBiz
 }
 
 func NewAuthBiz(
 	userRepo *repo.UserRepo,
+	jstBIz *JwtBiz,
 	logger *log.Logger,
 ) *AuthBiz {
 	return &AuthBiz{
 		userRepo: userRepo,
+		jwtBiz:   jstBIz,
 		logger:   logger,
 	}
 }

@@ -3,6 +3,7 @@ package category
 import (
 	"context"
 	"cyblog/internal/common"
+	"cyblog/internal/common/dto"
 	"cyblog/pkg/errs"
 	"cyblog/pkg/log"
 	"cyblog/pkg/model"
@@ -164,7 +165,7 @@ func (biz *CategoryBiz) List(ctx context.Context, page, pageSize int) (*ListResp
 	}
 
 	return &ListResponse{
-		PageInfo: common.PageInfo{
+		PageInfo: dto.PageInfo{
 			Total:    int(total),
 			Page:     page,
 			PageSize: pageSize,

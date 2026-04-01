@@ -1,6 +1,8 @@
 package tag
 
-import "cyblog/internal/common"
+import (
+	"cyblog/internal/common/dto"
+)
 
 // CreateRequest 创建标签请求
 // swagger:model CreateTagRequest
@@ -68,7 +70,7 @@ type Response struct {
 // ListResponse 标签列表响应
 // swagger:model TagListResponse
 type ListResponse struct {
-	common.PageInfo
+	dto.PageInfo
 
 	// 标签列表
 	List []*Response `json:"list"`

@@ -31,17 +31,18 @@ type JwtBiz struct {
 	tokenExpire   time.Duration
 	refreshExpire time.Duration
 	redisClient   *redis.Client
-
-	BotToken string
+	Issuer        string
+	BotToken      string
 }
 
 func NewJwtBiz(logger *log.Logger, vc *viper.Viper, redisClient *redis.Client) *JwtBiz {
 	return &JwtBiz{
 		logger:        logger,
-		secretKey:     "ppp",
+		secretKey:     vc.GetString("jwt.secret"),
 		tokenExpire:   time.Hour * 24 * 7,
 		refreshExpire: time.Hour * 24 * 30 * 3,
 		redisClient:   redisClient,
+		Issuer:        "cyblog",
 		BotToken:      vc.GetString("app.bot_token"),
 	}
 }
@@ -54,7 +55,7 @@ func (b *JwtBiz) GenerateToken(ctx context.Context, userID uint, userName string
 
 	claims := &Payload{
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "leyline-doc",
+			Issuer:    b.Issuer,
 			Subject:   userName,
 			IssuedAt:  jwt.NewNumericDate(now),
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
@@ -76,7 +77,7 @@ func (b *JwtBiz) GenerateToken(ctx context.Context, userID uint, userName string
 	refreshExpiresAt := now.Add(b.refreshExpire)
 
 	refreshClaims := &jwt.RegisteredClaims{
-		Issuer:    "leyline-doc",
+		Issuer:    b.Issuer,
 		Subject:   userName,
 		IssuedAt:  jwt.NewNumericDate(now),
 		ExpiresAt: jwt.NewNumericDate(refreshExpiresAt),

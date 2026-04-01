@@ -395,6 +395,89 @@ definitions:
     required:
     - id
     type: object
+  comment.ArticleCommentCountResponse:
+    properties:
+      article_id:
+        type: integer
+      comment_count:
+        type: integer
+    type: object
+  comment.CreateRequest:
+    properties:
+      article_id:
+        type: integer
+      content:
+        maxLength: 2000
+        minLength: 1
+        type: string
+      parent_id:
+        description: 0表示一级评论
+        type: integer
+    required:
+    - article_id
+    - content
+    type: object
+  comment.ListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/comment.Response'
+        type: array
+      page:
+        description: 当前页码
+        type: integer
+      page_size:
+        description: 每页数量
+        type: integer
+      total:
+        description: 总数
+        type: integer
+    type: object
+  comment.Response:
+    properties:
+      article_id:
+        type: integer
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_liked:
+        description: 当前用户是否已点赞
+        type: boolean
+      likes:
+        type: integer
+      parent_id:
+        type: integer
+      replies:
+        description: 子评论（分页查询时一级评论不包含回复，需要单独查询）
+        items:
+          $ref: '#/definitions/comment.Response'
+        type: array
+      reply_to:
+        allOf:
+        - $ref: '#/definitions/dto.User'
+        description: 回复评论时包含被回复的用户信息
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/dto.User'
+      user_id:
+        type: integer
+    type: object
+  comment.UpdateRequest:
+    properties:
+      content:
+        maxLength: 2000
+        minLength: 1
+        type: string
+      id:
+        type: integer
+    required:
+    - content
+    - id
+    type: object
   common.Response:
     properties:
       code:
@@ -404,6 +487,15 @@ definitions:
         description: 响应数据
       msg:
         description: 响应消息
+        type: string
+    type: object
+  dto.User:
+    properties:
+      avatar:
+        type: string
+      id:
+        type: integer
+      name:
         type: string
     type: object
   tag.CreateRequest:
@@ -582,6 +674,116 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/admin/comments:
+    get:
+      consumes:
+      - application/json
+      description: 分页获取所有评论列表，需要管理员权限
+      parameters:
+      - description: 搜索关键词
+        in: query
+        name: keyword
+        type: string
+      - description: 文章ID
+        in: query
+        name: article_id
+        type: integer
+      - description: 用户ID
+        in: query
+        name: user_id
+        type: integer
+      - default: created_at
+        description: 排序字段
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: 排序方式
+        in: query
+        name: sort_order
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/comment.ListResponse'
+              type: object
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 管理端获取评论列表
+      tags:
+      - 评论管理
+  /api/admin/comments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定评论，需要管理员权限
+      parameters:
+      - description: 评论ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: 无效的评论ID
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/common.Response'
+        "404":
+          description: 评论不存在
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 管理端删除评论
+      tags:
+      - 评论管理
   /api/articles:
     get:
       consumes:
@@ -808,6 +1010,40 @@ paths:
       summary: 获取文章详情
       tags:
       - 文章
+  /api/articles/{id}/comment-count:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定文章的评论数量
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/comment.ArticleCommentCountResponse'
+              type: object
+        "400":
+          description: 无效的文章ID
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 获取文章评论数
+      tags:
+      - 评论
   /api/articles/{id}/like:
     delete:
       consumes:
@@ -1148,6 +1384,321 @@ paths:
       summary: 删除分类
       tags:
       - 分类
+  /api/comments:
+    get:
+      consumes:
+      - application/json
+      description: 分页获取指定文章的评论列表
+      parameters:
+      - description: 文章ID
+        in: query
+        name: article_id
+        required: true
+        type: integer
+      - description: 父评论ID，不传则获取一级评论
+        in: query
+        name: parent_id
+        type: integer
+      - default: created_at
+        description: 排序字段：created_at, likes
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: 排序方式：asc, desc
+        in: query
+        name: sort_order
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/comment.ListResponse'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 获取文章评论列表
+      tags:
+      - 评论
+    post:
+      consumes:
+      - application/json
+      description: 对文章发表评论，需要登录
+      parameters:
+      - description: 创建评论请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/comment.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/comment.Response'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 创建评论
+      tags:
+      - 评论
+  /api/comments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定评论，仅作者或管理员可操作
+      parameters:
+      - description: 评论ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: 无效的评论ID
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/common.Response'
+        "404":
+          description: 评论不存在
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除评论
+      tags:
+      - 评论
+    put:
+      consumes:
+      - application/json
+      description: 更新评论内容，仅作者或管理员可操作
+      parameters:
+      - description: 评论ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 更新评论请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/comment.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/comment.Response'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/common.Response'
+        "404":
+          description: 评论不存在
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新评论
+      tags:
+      - 评论
+  /api/comments/{id}/like:
+    delete:
+      consumes:
+      - application/json
+      description: 取消对指定评论的点赞，需要登录
+      parameters:
+      - description: 评论ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 取消点赞成功
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: 无效的评论ID或未点赞
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "404":
+          description: 评论不存在
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 取消点赞
+      tags:
+      - 评论
+    post:
+      consumes:
+      - application/json
+      description: 对指定评论点赞，需要登录
+      parameters:
+      - description: 评论ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 点赞成功
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: 无效的评论ID或已点赞
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "404":
+          description: 评论不存在
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 点赞评论
+      tags:
+      - 评论
+  /api/comments/{id}/replies:
+    get:
+      consumes:
+      - application/json
+      description: 分页获取指定评论的回复列表
+      parameters:
+      - description: 评论ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/comment.ListResponse'
+              type: object
+        "400":
+          description: 无效的评论ID
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 获取评论的回复列表
+      tags:
+      - 评论
   /api/tags:
     get:
       consumes:

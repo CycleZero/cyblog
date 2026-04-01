@@ -1,7 +1,7 @@
 package article
 
 import (
-	"cyblog/internal/common"
+	"cyblog/internal/common/dto"
 	"cyblog/internal/domain/category"
 	"cyblog/internal/domain/tag"
 	"time"
@@ -95,7 +95,7 @@ type UpdateRequest struct {
 // ListQuery 文章列表查询参数
 // swagger:model ArticleListQuery
 type ListQuery struct {
-	common.PageParam
+	dto.PageParam
 
 	// 关键词
 	Keyword string `form:"keyword"`
@@ -195,7 +195,7 @@ type Response struct {
 // ListResponse 文章列表响应
 // swagger:model ArticleListResponse
 type ListResponse struct {
-	common.PageInfo
+	dto.PageInfo
 
 	// 文章列表
 	List []*Response `json:"list"`

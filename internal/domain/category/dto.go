@@ -1,6 +1,8 @@
 package category
 
-import "cyblog/internal/common"
+import (
+	"cyblog/internal/common/dto"
+)
 
 // CreateRequest 创建分类请求
 // swagger:model CreateCategoryRequest
@@ -83,7 +85,7 @@ type Response struct {
 // ListResponse 分类列表响应
 // swagger:model CategoryListResponse
 type ListResponse struct {
-	common.PageInfo
+	dto.PageInfo
 
 	// 分类列表
 	List []*Response `json:"list"`

@@ -10,8 +10,8 @@
 | **评论发布** | 用户对文章发表评论，支持一级评论和回复评论 |
 | **评论查询** | 获取文章评论列表，支持分页、树形结构展示 |
 | **评论管理** | 编辑、删除评论 |
-| **评论交互** | 评论点赞、取消点赞 |
-| **统计功能** | 文章评论数统计 |
+| **评论交互** | 评论点赞、取消点赞，记录用户点赞状态 |
+| **统计功能** | 文章评论数统计、评论点赞数统计 |
 
 ### 1.2 分层架构
 评论模块遵循项目统一的分层架构：
@@ -41,6 +41,19 @@ type Comment struct {
     User      *User      `gorm:"foreignKey:UserID"`
     Parent    *Comment   `gorm:"foreignKey:ParentID"`
     Replies   []*Comment `gorm:"foreignKey:ParentID;order:created_at asc"`
+}
+
+// CommentLike 评论点赞记录模型
+type CommentLike struct {
+    gorm.Model
+    CommentID uint      `gorm:"not null;index;comment:评论ID"`
+    UserID    uint      `gorm:"not null;index;comment:用户ID"`
+    IP        string    `gorm:"size:45;comment:点赞者IP"`
+    UserAgent string    `gorm:"size:500;comment:点赞者UserAgent"`
+    
+    // 关联
+    Comment *Comment `gorm:"foreignKey:CommentID"`
+    User    *User    `gorm:"foreignKey:UserID"`
 }
 ```
 
@@ -94,14 +107,11 @@ type Response struct {
     ParentID  uint      `json:"parent_id"`
     Content   string    `json:"content"`
     Likes     int       `json:"likes"`
+    IsLiked   bool      `json:"is_liked"` // 当前用户是否已点赞
     CreatedAt time.Time `json:"created_at"`
     UpdatedAt time.Time `json:"updated_at"`
     
-    User *struct {
-        ID     uint   `json:"id"`
-        Name   string `json:"name"`
-        Avatar string `json:"avatar"`
-    } `json:"user"`
+    User *dto.User `json:"user"`
     
     // 回复评论时包含被回复的用户信息
     ReplyTo *struct {
@@ -152,6 +162,16 @@ type CommentRepo interface {
     
     // 删除文章的所有评论
     DeleteByArticleID(ctx context.Context, articleID uint) error
+}
+
+// CommentLikeRepo 评论点赞记录Repo接口
+type CommentLikeRepo interface {
+    Create(ctx context.Context, like *model.CommentLike) error
+    Delete(ctx context.Context, commentID, userID uint) error
+    GetByCommentAndUser(ctx context.Context, commentID, userID uint) (*model.CommentLike, error)
+    Exists(ctx context.Context, commentID, userID uint) (bool, error)
+    GetByUser(ctx context.Context, userID uint, page, pageSize int) ([]*model.CommentLike, int64, error)
+    GetLikedCommentIDs(ctx context.Context, userID uint, commentIDs []uint) (map[uint]bool, error)
 }
 ```
 
@@ -222,11 +242,7 @@ func (s *CommentService) Create(c *gin.Context) {
         s.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
         return
     }
-    
-    // 可以将IP和UserAgent放入context传递给Biz层
-    ctx := context.WithValue(c, "ip", c.ClientIP())
-    ctx = context.WithValue(ctx, "user_agent", c.GetHeader("User-Agent"))
-    
+	
     resp, err := s.biz.Create(ctx, &req)
     if err != nil {
         s.Error(c, err)
@@ -242,20 +258,20 @@ func (s *CommentService) Create(c *gin.Context) {
 ### 4.1 公开接口（用户端）
 | 方法 | 路径 | 权限 | 描述 |
 |------|------|------|------|
-| POST | /api/v1/comments | 登录用户 | 发表评论 |
-| PUT | /api/v1/comments/:id | 作者/管理员 | 更新评论 |
-| DELETE | /api/v1/comments/:id | 作者/管理员 | 删除评论 |
-| GET | /api/v1/comments | 公开 | 获取文章评论列表 |
-| GET | /api/v1/comments/:id/replies | 公开 | 获取评论的回复列表 |
-| GET | /api/v1/articles/:id/comment-count | 公开 | 获取文章评论数 |
-| POST | /api/v1/comments/:id/like | 登录用户 | 点赞评论 |
-| DELETE | /api/v1/comments/:id/like | 登录用户 | 取消点赞 |
+| POST | /api/comments | 登录用户 | 发表评论 |
+| PUT | /api/comments/:id | 作者/管理员 | 更新评论 |
+| DELETE | /api/comments/:id | 作者/管理员 | 删除评论 |
+| GET | /api/comments | 公开 | 获取文章评论列表 |
+| GET | /api/comments/:id/replies | 公开 | 获取评论的回复列表 |
+| GET | /api/articles/:id/comment-count | 公开 | 获取文章评论数 |
+| POST | /api/comments/:id/like | 登录用户 | 点赞评论 |
+| DELETE | /api/comments/:id/like | 登录用户 | 取消点赞 |
 
 ### 4.2 管理接口
 | 方法 | 路径 | 权限 | 描述 |
 |------|------|------|------|
-| GET | /api/v1/admin/comments | 管理员 | 获取所有评论列表 |
-| DELETE | /api/v1/admin/comments/:id | 管理员 | 删除评论 |
+| GET | /api/admin/comments | 管理员 | 获取所有评论列表 |
+| DELETE | /api/admin/comments/:id | 管理员 | 删除评论 |
 
 ## 5. 数据库表结构设计
 
@@ -281,6 +297,25 @@ func (s *CommentService) Create(c *gin.Context) {
 - INDEX idx_parent_id (parent_id)
 - INDEX idx_created_at (created_at)
 - 联合索引: INDEX idx_article_parent (article_id, parent_id, created_at)
+
+### 5.2 comment_likes 评论点赞记录表
+| 字段名 | 类型 | 允许空 | 默认值 | 注释 |
+|--------|------|--------|--------|------|
+| id | uint | 否 | auto_increment | 主键 |
+| comment_id | uint | 否 | | 评论ID（索引） |
+| user_id | uint | 否 | | 用户ID（索引） |
+| ip | varchar(45) | 是 | | 点赞者IP地址（支持IPv6） |
+| user_agent | varchar(500) | 是 | | 点赞者UserAgent |
+| created_at | datetime | 否 | | 创建时间 |
+| updated_at | datetime | 否 | | 更新时间 |
+| deleted_at | datetime | 是 | | 删除时间 |
+
+**索引设计：**
+- PRIMARY KEY (id)
+- UNIQUE KEY uk_comment_user (comment_id, user_id)
+- INDEX idx_comment_id (comment_id)
+- INDEX idx_user_id (user_id)
+- INDEX idx_created_at (created_at)
 
 ## 6. 业务规则说明
 
@@ -309,40 +344,43 @@ func (s *CommentService) Create(c *gin.Context) {
 ### 6.4 点赞规则
 1. 必须登录才能点赞
 2. 点赞前需检查评论是否存在
-3. TODO：后续添加点赞记录表，防止重复点赞
+3. 同一用户对同一评论只能点赞一次
+4. 点赞时创建点赞记录，同时评论点赞数+1
+5. 取消点赞时删除点赞记录，同时评论点赞数-1
+6. 查询评论列表时，批量获取当前用户的点赞状态
 
 ## 7. 实现步骤
 
 ### 7.1 基础层实现
-1. 创建`pkg/model/comment.go`，定义Comment模型
-2. 在`pkg/repo/article.go`的AutoMigrate中添加Comment模型迁移，或创建`pkg/repo/comment.go`
+1. 创建`pkg/model/comment.go`，定义Comment和CommentLike模型
+2. 在`pkg/repo/article.go`的AutoMigrate中添加Comment和CommentLike模型迁移，或创建`pkg/repo/comment.go`
 
 ### 7.2 Repo层实现
 3. 创建`pkg/repo/comment.go`，实现CommentRepo接口
+4. 创建`pkg/repo/comment_like.go`，实现CommentLikeRepo接口
 
 ### 7.3 Biz层实现
-4. 创建`internal/domain/comment`目录：
+5. 创建`internal/domain/comment`目录：
    - `dto.go`：定义评论相关请求/响应DTO
    - `biz.go`：实现CommentBiz业务逻辑
    - `service.go`：实现CommentService
    - `provider.go`：依赖注入配置
-5. 在`internal/domain/provider.go`中注册Comment模块Provider
+6. 在`internal/domain/provider.go`中注册Comment模块Provider
 
 ### 7.4 Route层实现
-6. 创建`internal/route/comment.go`，定义评论HTTP路由
-7. 在主路由中注册评论路由
+7. 创建`internal/route/comment.go`，定义评论HTTP路由
+8. 在主路由中注册评论路由
 
 ### 7.5 集成与测试
-8. 在Article模块中集成评论数展示（可选）
-9. 编写单元测试
-10. 接口测试
+9. 在Article模块中集成评论数展示（可选）
+10. 编写单元测试
+11. 接口测试
 
 ## 8. 后续优化方向
 
 1. **敏感词过滤**：评论发布前进行敏感词检测
-2. **点赞记录表**：记录用户点赞行为，防止重复点赞
-3. **评论通知**：用户收到回复时发送通知
-4. **评论举报**：用户可以举报不当评论
-5. **富文本支持**：支持简单的Markdown或HTML标签
-6. **评论排序策略**：热门评论、最新评论等多种排序方式
-7. **评论缓存**：对热点文章的评论进行缓存
+2. **评论通知**：用户收到回复时发送通知
+3. **评论举报**：用户可以举报不当评论
+4. **富文本支持**：支持简单的Markdown或HTML标签
+5. **评论排序策略**：热门评论、最新评论等多种排序方式
+6. **评论缓存**：对热点文章的评论进行缓存

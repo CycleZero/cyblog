@@ -3,6 +3,7 @@ package tag
 import (
 	"context"
 	"cyblog/internal/common"
+	"cyblog/internal/common/dto"
 	"cyblog/pkg/errs"
 	"cyblog/pkg/log"
 	"cyblog/pkg/model"
@@ -159,7 +160,7 @@ func (biz *TagBiz) List(ctx context.Context, page, pageSize int) (*ListResponse,
 	}
 
 	return &ListResponse{
-		PageInfo: common.PageInfo{
+		PageInfo: dto.PageInfo{
 			Total:    int(total),
 			Page:     page,
 			PageSize: pageSize,

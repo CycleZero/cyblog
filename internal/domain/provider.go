@@ -4,6 +4,7 @@ import (
 	"cyblog/internal/domain/article"
 	"cyblog/internal/domain/auth"
 	"cyblog/internal/domain/category"
+	"cyblog/internal/domain/comment"
 	"cyblog/internal/domain/tag"
 	"cyblog/internal/domain/user"
 
@@ -17,4 +18,5 @@ var ProviderSet = wire.NewSet(
 	category.ProviderSet,
 	tag.ProviderSet,
 	article.ProviderSet,
+	comment.ProviderSet,
 )

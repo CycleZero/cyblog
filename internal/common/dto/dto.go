@@ -1,4 +1,4 @@
-package common
+package dto
 
 // PageParam 分页请求参数
 // swagger:model PageParam
@@ -21,4 +21,10 @@ type PageInfo struct {
 
 	// 每页数量
 	PageSize int `json:"page_size"`
+}
+
+type User struct {
+	ID     uint   `json:"id"`
+	Name   string `json:"name"`
+	Avatar string `json:"avatar"`
 }

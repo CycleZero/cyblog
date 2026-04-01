@@ -4,7 +4,6 @@ import (
 	"cyblog/internal/common"
 	"cyblog/pkg/errs"
 	"cyblog/pkg/log"
-	"cyblog/pkg/util"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,12 +15,18 @@ type AuthService struct {
 	common.BaseService
 	biz    *AuthBiz
 	logger *log.Logger
+	jwtBiz *JwtBiz
 }
 
-func NewAuthService(biz *AuthBiz, logger *log.Logger) *AuthService {
+func NewAuthService(
+	biz *AuthBiz,
+	logger *log.Logger,
+	jwtBiz *JwtBiz,
+) *AuthService {
 	return &AuthService{
 		biz:    biz,
 		logger: logger,
+		jwtBiz: jwtBiz,
 	}
 }
 
@@ -53,7 +58,7 @@ func (s *AuthService) Register(c *gin.Context) {
 	}
 
 	// 生成Token
-	token, err := util.GenerateToken(user)
+	token, _, err := s.jwtBiz.GenerateToken(c, user.ID, user.Name)
 	if err != nil {
 		s.logger.Error("生成Token失败", zap.Error(err))
 		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "注册失败", err))
@@ -99,7 +104,7 @@ func (s *AuthService) Login(c *gin.Context) {
 	}
 
 	// 生成Token
-	token, err := util.GenerateToken(user)
+	token, _, err := s.jwtBiz.GenerateToken(c, user.ID, user.Name)
 	if err != nil {
 		s.logger.Error("生成Token失败", zap.Error(err))
 		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "登录失败", err))

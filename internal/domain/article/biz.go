@@ -3,6 +3,7 @@ package article
 import (
 	"context"
 	"cyblog/internal/common"
+	"cyblog/internal/common/dto"
 	"cyblog/internal/domain/category"
 	"cyblog/internal/domain/tag"
 	"cyblog/pkg/errs"
@@ -365,7 +366,7 @@ func (biz *ArticleBiz) List(ctx context.Context, query *ListQuery) (*ListRespons
 	}
 
 	return &ListResponse{
-		PageInfo: common.PageInfo{
+		PageInfo: dto.PageInfo{
 			Total:    int(total),
 			Page:     query.Page,
 			PageSize: query.PageSize,

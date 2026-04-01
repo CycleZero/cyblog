@@ -1,6 +1,7 @@
 package infra
 
 // 该项目暂时弃用MongoDB
+
 //func NewMongoDb(vc *viper.Viper) *mongo.Client {
 //	host := vc.GetString("data.mongo.host")
 //	port := vc.GetString("data.mongo.port")
