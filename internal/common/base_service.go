@@ -17,7 +17,7 @@ type Response struct {
 	Msg  string `json:"msg"`
 }
 
-func (s *BaseService) Success(c *gin.Context, data any) {
+func Success(c *gin.Context, data any) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": http.StatusOK,
 		"data": data,
@@ -25,7 +25,7 @@ func (s *BaseService) Success(c *gin.Context, data any) {
 	})
 }
 
-func (s *BaseService) Fail(c *gin.Context, code int, msg string) {
+func Fail(c *gin.Context, code int, msg string) {
 	c.JSON(code, gin.H{
 		"code": code,
 		"data": nil,
@@ -33,6 +33,6 @@ func (s *BaseService) Fail(c *gin.Context, code int, msg string) {
 	})
 }
 
-func (s *BaseService) Error(c *gin.Context, err *errs.CyBlogError) {
-	s.Fail(c, errs.Code(err), err.Error())
+func Error(c *gin.Context, err *errs.CyBlogError) {
+	Fail(c, errs.Code(err), err.Error())
 }

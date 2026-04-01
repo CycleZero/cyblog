@@ -26,6 +26,9 @@ func RegisterRouter(root gin.IRouter, serviceHub *domain.ServiceHub) {
 	// 注册路由
 	RegisterAuthRoutes(apiGroup, serviceHub.AuthService)
 	RegisterUserRoutes(apiGroup, serviceHub.UserService)
+	RegisterCategoryRoutes(apiGroup, serviceHub.CategoryService)
+	RegisterTagRoutes(apiGroup, serviceHub.TagService)
+	RegisterArticleRoutes(apiGroup, serviceHub.ArticleService)
 }
 
 func RegisterUserRoutes(api gin.IRouter, userService *user.UserService) {
@@ -33,7 +36,7 @@ func RegisterUserRoutes(api gin.IRouter, userService *user.UserService) {
 	{
 		// 公开用户接口
 		userGroup.GET("/:id", userService.GetUser)
-		
+
 		// 需要认证的用户接口（统一应用鉴权中间件）
 		authUserGroup := userGroup.Group("", middlewire.AuthMiddleWire(true))
 		{

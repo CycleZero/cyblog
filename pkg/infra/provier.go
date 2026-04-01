@@ -12,7 +12,7 @@ var ProviderSet = wire.NewSet(
 	NewCustomRedisClient,
 	NewNatsMQ,
 	NewMinioClient,
-	NewMongoDb,
+	//NewMongoDb,
 	NewLLmClient,
 	ProvideDB,
 )

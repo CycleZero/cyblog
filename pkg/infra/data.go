@@ -10,7 +10,6 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -22,7 +21,7 @@ type Data struct {
 	DB          *gorm.DB
 	logger      *zap.Logger
 	RedisClient *RedisClient
-	MongoDb     *mongo.Client
+	//MongoDb     *mongo.Client
 	MinioClient *minio.Client
 	NatsMQ      *NatsMQ
 }
@@ -53,7 +52,7 @@ func (r *RedisClient) PutObject(ctx context.Context, key string, target any, exp
 func NewData(
 	vc *viper.Viper,
 	rdb *RedisClient,
-	mongoc *mongo.Client,
+	//mongoc *mongo.Client,
 	minioClient *minio.Client,
 	natsMQ *NatsMQ,
 ) *Data {
@@ -76,9 +75,9 @@ func NewData(
 	}
 	initTaskQueue()
 	return &Data{
-		DB:          masterDB,
-		logger:      logger,
-		MongoDb:     mongoc,
+		DB:     masterDB,
+		logger: logger,
+		//MongoDb:     mongoc,
 		RedisClient: rdb,
 		MinioClient: minioClient,
 		NatsMQ:      natsMQ,
@@ -154,10 +153,10 @@ func GetDB() *gorm.DB {
 }
 
 func (d *Data) Close() error {
-	err := d.MongoDb.Disconnect(context.Background())
-	if err != nil {
-		return err
-	}
+	//err := d.MongoDb.Disconnect(context.Background())
+	//if err != nil {
+	//	return err
+	//}
 	return nil
 }
 

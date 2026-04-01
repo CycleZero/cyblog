@@ -29,17 +29,17 @@ func (s *UserService) GetUser(c *gin.Context) {
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		s.logger.Sugar().Error(err)
-		s.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
+		common.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
 		return
 	}
 	user, err := s.biz.GetUser(c, req.Id)
 	if err != nil {
 		s.logger.Error(err.Error())
-		s.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "获取用户失败", err))
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "获取用户失败", err))
 		return
 	}
 	s.logger.Info("获取用户成功")
-	s.Success(c, GetUserResponse{
+	common.Success(c, GetUserResponse{
 		Id:     user.ID,
 		Name:   user.Name,
 		Email:  user.Email,
@@ -56,18 +56,18 @@ func (s *UserService) GetCurrentUser(c *gin.Context) {
 	// 从上下文获取用户ID
 	userId, exists := c.Get("user_id")
 	if !exists {
-		s.Error(c, errs.New(http.StatusUnauthorized, "用户未登录"))
+		common.Error(c, errs.New(http.StatusUnauthorized, "用户未登录"))
 		return
 	}
 
 	user, err := s.biz.GetUser(c, userId.(uint))
 	if err != nil {
 		s.logger.Error(err.Error())
-		s.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "获取用户信息失败", err))
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "获取用户信息失败", err))
 		return
 	}
 
-	s.Success(c, UserInfoResponse{
+	common.Success(c, UserInfoResponse{
 		Id:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
@@ -84,7 +84,7 @@ func (s *UserService) UpdateUser(c *gin.Context) {
 	// 从上下文获取用户ID
 	userId, exists := c.Get("user_id")
 	if !exists {
-		s.Error(c, errs.New(http.StatusUnauthorized, "用户未登录"))
+		common.Error(c, errs.New(http.StatusUnauthorized, "用户未登录"))
 		return
 	}
 
@@ -92,26 +92,26 @@ func (s *UserService) UpdateUser(c *gin.Context) {
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		s.logger.Sugar().Error(err)
-		s.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
+		common.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
 		return
 	}
 
 	user, err := s.biz.GetUser(c, userId.(uint))
 	if err != nil {
 		s.logger.Error(err.Error())
-		s.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "获取用户信息失败", err))
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "获取用户信息失败", err))
 		return
 	}
 
 	updatedUser, err := s.biz.UpdateUser(c, user, req.Name, req.Email, req.Avatar, req.Password)
 	if err != nil {
 		s.logger.Error(err.Error())
-		s.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "更新用户信息失败", err))
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "更新用户信息失败", err))
 		return
 	}
 
 	s.logger.Info("用户信息更新成功", zap.String("name", updatedUser.Name))
-	s.Success(c, UserInfoResponse{
+	common.Success(c, UserInfoResponse{
 		Id:        updatedUser.ID,
 		Name:      updatedUser.Name,
 		Email:     updatedUser.Email,

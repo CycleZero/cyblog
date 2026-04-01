@@ -13,6 +13,11 @@ type UserRepo struct {
 }
 
 func NewUserRepo(data *infra.Data, logger *log.Logger) *UserRepo {
+	err := data.DB.AutoMigrate(&model.User{})
+	if err != nil {
+		log.GetLogger().Sugar().Errorf("AutoMigrate 创建表失败：%v", err)
+		panic(err)
+	}
 	return &UserRepo{
 		data:   data,
 		logger: logger,

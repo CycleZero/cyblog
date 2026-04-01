@@ -30,14 +30,14 @@ func (s *AuthService) Register(c *gin.Context) {
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		s.logger.Sugar().Error(err)
-		s.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
+		common.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
 		return
 	}
 
 	user, err := s.biz.Register(c, req.Name, req.Email, req.Password)
 	if err != nil {
 		s.logger.Error(err.Error())
-		s.Error(c, errs.Wrap(http.StatusInternalServerError, "注册失败", err))
+		common.Error(c, errs.Wrap(http.StatusInternalServerError, "注册失败", err))
 		return
 	}
 
@@ -45,12 +45,12 @@ func (s *AuthService) Register(c *gin.Context) {
 	token, err := util.GenerateToken(user)
 	if err != nil {
 		s.logger.Error("生成Token失败", zap.Error(err))
-		s.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "注册失败", err))
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "注册失败", err))
 		return
 	}
 
 	s.logger.Info("用户注册成功", zap.String("name", user.Name))
-	s.Success(c, RegisterResponse{
+	common.Success(c, RegisterResponse{
 		Id:     user.ID,
 		Name:   user.Name,
 		Email:  user.Email,
@@ -66,14 +66,14 @@ func (s *AuthService) Login(c *gin.Context) {
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		s.logger.Sugar().Error(err)
-		s.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
+		common.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
 		return
 	}
 
 	user, err := s.biz.Login(c, req.Account, req.Password)
 	if err != nil {
 		s.logger.Error(err.Error())
-		s.Error(c, errs.Wrap(http.StatusInternalServerError, "登录失败", err))
+		common.Error(c, errs.Wrap(http.StatusInternalServerError, "登录失败", err))
 		return
 	}
 
@@ -81,12 +81,12 @@ func (s *AuthService) Login(c *gin.Context) {
 	token, err := util.GenerateToken(user)
 	if err != nil {
 		s.logger.Error("生成Token失败", zap.Error(err))
-		s.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "登录失败", err))
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "登录失败", err))
 		return
 	}
 
 	s.logger.Info("用户登录成功", zap.String("name", user.Name))
-	s.Success(c, LoginResponse{
+	common.Success(c, LoginResponse{
 		Id:     user.ID,
 		Name:   user.Name,
 		Email:  user.Email,
