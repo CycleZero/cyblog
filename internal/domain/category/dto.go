@@ -3,38 +3,88 @@ package category
 import "cyblog/internal/common"
 
 // CreateRequest 创建分类请求
+// swagger:model CreateCategoryRequest
 type CreateRequest struct {
-	Name        string `json:"name" binding:"required,max=50"`
-	Slug        string `json:"slug" binding:"required,max=50"`
+	// 分类名称
+	// required: true
+	// max length: 50
+	Name string `json:"name" binding:"required,max=50"`
+
+	// 分类别名
+	// required: true
+	// max length: 50
+	Slug string `json:"slug" binding:"required,max=50"`
+
+	// 分类描述
+	// max length: 200
 	Description string `json:"description" binding:"max=200"`
-	ParentID    uint   `json:"parent_id"`
-	Sort        int    `json:"sort"`
+
+	// 父分类ID
+	ParentID uint `json:"parent_id"`
+
+	// 排序
+	Sort int `json:"sort"`
 }
 
 // UpdateRequest 更新分类请求
+// swagger:model UpdateCategoryRequest
 type UpdateRequest struct {
-	ID          uint   `json:"id" binding:"required"`
-	Name        string `json:"name" binding:"max=50"`
-	Slug        string `json:"slug" binding:"max=50"`
+	// 分类ID
+	// required: true
+	ID uint `json:"id" binding:"required"`
+
+	// 分类名称
+	// max length: 50
+	Name string `json:"name" binding:"max=50"`
+
+	// 分类别名
+	// max length: 50
+	Slug string `json:"slug" binding:"max=50"`
+
+	// 分类描述
+	// max length: 200
 	Description string `json:"description" binding:"max=200"`
-	ParentID    *uint  `json:"parent_id"`
-	Sort        *int   `json:"sort"`
+
+	// 父分类ID
+	ParentID *uint `json:"parent_id"`
+
+	// 排序
+	Sort *int `json:"sort"`
 }
 
 // Response 分类响应
+// swagger:model CategoryResponse
 type Response struct {
-	ID          uint   `json:"id"`
-	Name        string `json:"name"`
-	Slug        string `json:"slug"`
+	// 分类ID
+	ID uint `json:"id"`
+
+	// 分类名称
+	Name string `json:"name"`
+
+	// 分类别名
+	Slug string `json:"slug"`
+
+	// 分类描述
 	Description string `json:"description"`
-	ParentID    uint   `json:"parent_id"`
-	Sort        int    `json:"sort"`
-	CreatedAt   string `json:"created_at"`
-	UpdatedAt   string `json:"updated_at"`
+
+	// 父分类ID
+	ParentID uint `json:"parent_id"`
+
+	// 排序
+	Sort int `json:"sort"`
+
+	// 创建时间
+	CreatedAt string `json:"created_at"`
+
+	// 更新时间
+	UpdatedAt string `json:"updated_at"`
 }
 
 // ListResponse 分类列表响应
+// swagger:model CategoryListResponse
 type ListResponse struct {
 	common.PageInfo
+
+	// 分类列表
 	List []*Response `json:"list"`
 }

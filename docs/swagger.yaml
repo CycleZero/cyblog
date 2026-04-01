@@ -1,0 +1,1419 @@
+definitions:
+  article.CreateRequest:
+    properties:
+      category_id:
+        description: 分类ID
+        type: integer
+      content:
+        description: |-
+          内容
+          required: true
+        type: string
+      cover_image:
+        description: |-
+          封面图片
+          format: url
+        type: string
+      is_original:
+        description: 是否原创
+        type: boolean
+      is_top:
+        description: 是否置顶
+        type: boolean
+      slug:
+        description: |-
+          别名
+          max length: 100
+        maxLength: 100
+        type: string
+      status:
+        description: |-
+          状态 1:草稿 2:已发布 3:私密
+          required: true
+          enum: 1,2,3
+        enum:
+        - 1
+        - 2
+        - 3
+        type: integer
+      summary:
+        description: |-
+          摘要
+          max length: 500
+        maxLength: 500
+        type: string
+      tag_ids:
+        description: 标签ID列表
+        items:
+          type: integer
+        type: array
+      title:
+        description: |-
+          标题
+          required: true
+          max length: 255
+        maxLength: 255
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  article.ListResponse:
+    properties:
+      list:
+        description: 文章列表
+        items:
+          $ref: '#/definitions/article.Response'
+        type: array
+      page:
+        description: 当前页码
+        type: integer
+      page_size:
+        description: 每页数量
+        type: integer
+      total:
+        description: 总数
+        type: integer
+    type: object
+  article.Response:
+    properties:
+      author:
+        description: 作者
+        properties:
+          avatar:
+            description: 头像
+            type: string
+          id:
+            description: 作者ID
+            type: integer
+          name:
+            description: 作者名
+            type: string
+        type: object
+      category:
+        allOf:
+        - $ref: '#/definitions/category.Response'
+        description: 分类
+      cover_image:
+        description: 封面图片
+        type: string
+      created_at:
+        description: 创建时间
+        type: string
+      id:
+        description: 文章ID
+        type: integer
+      is_original:
+        description: 是否原创
+        type: boolean
+      is_top:
+        description: 是否置顶
+        type: boolean
+      likes:
+        description: 点赞数
+        type: integer
+      slug:
+        description: 别名
+        type: string
+      status:
+        description: 状态
+        type: integer
+      summary:
+        description: 摘要
+        type: string
+      tags:
+        description: 标签列表
+        items:
+          $ref: '#/definitions/tag.Response'
+        type: array
+      title:
+        description: 标题
+        type: string
+      updated_at:
+        description: 更新时间
+        type: string
+      views:
+        description: 浏览量
+        type: integer
+    type: object
+  article.UpdateRequest:
+    properties:
+      category_id:
+        description: 分类ID
+        type: integer
+      content:
+        description: 内容
+        type: string
+      cover_image:
+        description: |-
+          封面图片
+          format: url
+        type: string
+      id:
+        description: |-
+          文章ID
+          required: true
+        type: integer
+      is_original:
+        description: 是否原创
+        type: boolean
+      is_top:
+        description: 是否置顶
+        type: boolean
+      slug:
+        description: |-
+          别名
+          max length: 100
+        maxLength: 100
+        type: string
+      status:
+        description: |-
+          状态 1:草稿 2:已发布 3:私密
+          enum: 1,2,3
+        enum:
+        - 1
+        - 2
+        - 3
+        type: integer
+      summary:
+        description: |-
+          摘要
+          max length: 500
+        maxLength: 500
+        type: string
+      tag_ids:
+        description: 标签ID列表
+        items:
+          type: integer
+        type: array
+      title:
+        description: |-
+          标题
+          max length: 255
+        maxLength: 255
+        type: string
+    required:
+    - id
+    type: object
+  auth.LoginRequest:
+    properties:
+      account:
+        description: |-
+          账号（用户名或邮箱）
+          required: true
+        type: string
+      password:
+        description: |-
+          密码
+          required: true
+          min length: 6
+          max length: 20
+        maxLength: 20
+        minLength: 6
+        type: string
+    required:
+    - account
+    - password
+    type: object
+  auth.LoginResponse:
+    properties:
+      avatar:
+        description: 头像
+        type: string
+      email:
+        description: 邮箱
+        type: string
+      id:
+        description: 用户ID
+        type: integer
+      name:
+        description: 用户名
+        type: string
+      role:
+        description: 角色
+        type: string
+      token:
+        description: 认证Token
+        type: string
+    type: object
+  auth.RegisterRequest:
+    properties:
+      email:
+        description: |-
+          邮箱
+          required: true
+          format: email
+        type: string
+      name:
+        description: |-
+          用户名
+          required: true
+          min length: 2
+          max length: 20
+        maxLength: 20
+        minLength: 2
+        type: string
+      password:
+        description: |-
+          密码
+          required: true
+          min length: 6
+          max length: 20
+        maxLength: 20
+        minLength: 6
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  auth.RegisterResponse:
+    properties:
+      avatar:
+        description: 头像
+        type: string
+      email:
+        description: 邮箱
+        type: string
+      id:
+        description: 用户ID
+        type: integer
+      name:
+        description: 用户名
+        type: string
+      token:
+        description: 认证Token
+        type: string
+    type: object
+  category.CreateRequest:
+    properties:
+      description:
+        description: |-
+          分类描述
+          max length: 200
+        maxLength: 200
+        type: string
+      name:
+        description: |-
+          分类名称
+          required: true
+          max length: 50
+        maxLength: 50
+        type: string
+      parent_id:
+        description: 父分类ID
+        type: integer
+      slug:
+        description: |-
+          分类别名
+          required: true
+          max length: 50
+        maxLength: 50
+        type: string
+      sort:
+        description: 排序
+        type: integer
+    required:
+    - name
+    - slug
+    type: object
+  category.ListResponse:
+    properties:
+      list:
+        description: 分类列表
+        items:
+          $ref: '#/definitions/category.Response'
+        type: array
+      page:
+        description: 当前页码
+        type: integer
+      page_size:
+        description: 每页数量
+        type: integer
+      total:
+        description: 总数
+        type: integer
+    type: object
+  category.Response:
+    properties:
+      created_at:
+        description: 创建时间
+        type: string
+      description:
+        description: 分类描述
+        type: string
+      id:
+        description: 分类ID
+        type: integer
+      name:
+        description: 分类名称
+        type: string
+      parent_id:
+        description: 父分类ID
+        type: integer
+      slug:
+        description: 分类别名
+        type: string
+      sort:
+        description: 排序
+        type: integer
+      updated_at:
+        description: 更新时间
+        type: string
+    type: object
+  category.UpdateRequest:
+    properties:
+      description:
+        description: |-
+          分类描述
+          max length: 200
+        maxLength: 200
+        type: string
+      id:
+        description: |-
+          分类ID
+          required: true
+        type: integer
+      name:
+        description: |-
+          分类名称
+          max length: 50
+        maxLength: 50
+        type: string
+      parent_id:
+        description: 父分类ID
+        type: integer
+      slug:
+        description: |-
+          分类别名
+          max length: 50
+        maxLength: 50
+        type: string
+      sort:
+        description: 排序
+        type: integer
+    required:
+    - id
+    type: object
+  common.Response:
+    properties:
+      code:
+        description: 响应码
+        type: integer
+      data:
+        description: 响应数据
+      msg:
+        description: 响应消息
+        type: string
+    type: object
+  tag.CreateRequest:
+    properties:
+      color:
+        description: |-
+          标签颜色（十六进制）
+          format: hexcolor
+        type: string
+      name:
+        description: |-
+          标签名称
+          required: true
+          max length: 50
+        maxLength: 50
+        type: string
+      slug:
+        description: |-
+          标签别名
+          required: true
+          max length: 50
+        maxLength: 50
+        type: string
+    required:
+    - name
+    - slug
+    type: object
+  tag.ListResponse:
+    properties:
+      list:
+        description: 标签列表
+        items:
+          $ref: '#/definitions/tag.Response'
+        type: array
+      page:
+        description: 当前页码
+        type: integer
+      page_size:
+        description: 每页数量
+        type: integer
+      total:
+        description: 总数
+        type: integer
+    type: object
+  tag.Response:
+    properties:
+      color:
+        description: 标签颜色
+        type: string
+      count:
+        description: 使用数量
+        type: integer
+      created_at:
+        description: 创建时间
+        type: string
+      id:
+        description: 标签ID
+        type: integer
+      name:
+        description: 标签名称
+        type: string
+      slug:
+        description: 标签别名
+        type: string
+      updated_at:
+        description: 更新时间
+        type: string
+    type: object
+  tag.UpdateRequest:
+    properties:
+      color:
+        description: |-
+          标签颜色（十六进制）
+          format: hexcolor
+        type: string
+      id:
+        description: |-
+          标签ID
+          required: true
+        type: integer
+      name:
+        description: |-
+          标签名称
+          max length: 50
+        maxLength: 50
+        type: string
+      slug:
+        description: |-
+          标签别名
+          max length: 50
+        maxLength: 50
+        type: string
+    required:
+    - id
+    type: object
+  user.GetUserRequest:
+    properties:
+      id:
+        description: 用户ID
+        type: integer
+    type: object
+  user.GetUserResponse:
+    properties:
+      avatar:
+        description: 头像
+        type: string
+      email:
+        description: 邮箱
+        type: string
+      id:
+        description: 用户ID
+        type: integer
+      name:
+        description: 用户名
+        type: string
+      role:
+        description: 角色
+        type: string
+      status:
+        description: 状态
+        type: integer
+    type: object
+  user.UpdateUserRequest:
+    properties:
+      avatar:
+        description: |-
+          头像
+          format: url
+        type: string
+      email:
+        description: |-
+          邮箱
+          format: email
+        type: string
+      name:
+        description: |-
+          用户名
+          min length: 2
+          max length: 20
+        maxLength: 20
+        minLength: 2
+        type: string
+      password:
+        description: |-
+          密码
+          min length: 6
+          max length: 20
+        maxLength: 20
+        minLength: 6
+        type: string
+    type: object
+  user.UserInfoResponse:
+    properties:
+      avatar:
+        description: 头像
+        type: string
+      created_at:
+        description: 创建时间
+        type: string
+      email:
+        description: 邮箱
+        type: string
+      id:
+        description: 用户ID
+        type: integer
+      name:
+        description: 用户名
+        type: string
+      role:
+        description: 角色
+        type: string
+      status:
+        description: 状态
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /api/articles:
+    get:
+      consumes:
+      - application/json
+      description: 分页获取文章列表，支持多种筛选条件
+      parameters:
+      - description: 关键词搜索
+        in: query
+        name: keyword
+        type: string
+      - description: 分类ID
+        in: query
+        name: category_id
+        type: integer
+      - description: 标签ID
+        in: query
+        name: tag_id
+        type: integer
+      - description: 状态
+        in: query
+        name: status
+        type: integer
+      - description: 作者ID
+        in: query
+        name: author_id
+        type: integer
+      - description: 是否置顶
+        in: query
+        name: is_top
+        type: boolean
+      - default: created_at
+        description: 排序字段
+        in: query
+        name: sort_by
+        type: string
+      - default: desc
+        description: 排序方式
+        in: query
+        name: sort_order
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/article.ListResponse'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 获取文章列表
+      tags:
+      - 文章
+    post:
+      consumes:
+      - application/json
+      description: 创建新文章，需要认证
+      parameters:
+      - description: 创建文章请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/article.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/article.Response'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 创建文章
+      tags:
+      - 文章
+    put:
+      consumes:
+      - application/json
+      description: 更新文章信息，需要认证
+      parameters:
+      - description: 更新文章请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/article.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/article.Response'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新文章
+      tags:
+      - 文章
+  /api/articles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定文章，需要认证
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: 无效的文章ID
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除文章
+      tags:
+      - 文章
+    get:
+      consumes:
+      - application/json
+      description: 根据文章ID获取文章详情
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - default: true
+        description: 是否增加浏览量
+        in: query
+        name: increment_views
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/article.Response'
+              type: object
+        "400":
+          description: 无效的文章ID
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 获取文章详情
+      tags:
+      - 文章
+  /api/articles/{id}/like:
+    delete:
+      consumes:
+      - application/json
+      description: 取消对文章的点赞，需要认证
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 取消点赞成功
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: 无效的文章ID
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 取消点赞
+      tags:
+      - 文章
+    post:
+      consumes:
+      - application/json
+      description: 为文章点赞，需要认证
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 点赞成功
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: 无效的文章ID
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 点赞文章
+      tags:
+      - 文章
+  /api/articles/slug/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: 根据文章别名获取文章详情
+      parameters:
+      - description: 文章别名
+        in: path
+        name: slug
+        required: true
+        type: string
+      - default: true
+        description: 是否增加浏览量
+        in: query
+        name: increment_views
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/article.Response'
+              type: object
+        "400":
+          description: 文章别名不能为空
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 根据别名获取文章
+      tags:
+      - 文章
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录接口，支持用户名或邮箱登录，返回用户信息和Token
+      parameters:
+      - description: 登录请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登录成功，返回用户信息和Token
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.LoginResponse'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 用户登录
+      tags:
+      - 认证
+  /api/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: 新用户注册接口，创建账号并返回用户信息和Token
+      parameters:
+      - description: 注册请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 注册成功，返回用户信息和Token
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.RegisterResponse'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 用户注册
+      tags:
+      - 认证
+  /api/categories:
+    get:
+      consumes:
+      - application/json
+      description: 分页获取分类列表
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/category.ListResponse'
+              type: object
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 获取分类列表
+      tags:
+      - 分类
+    post:
+      consumes:
+      - application/json
+      description: 创建新分类，需要管理员权限
+      parameters:
+      - description: 创建分类请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/category.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/category.Response'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 创建分类
+      tags:
+      - 分类
+    put:
+      consumes:
+      - application/json
+      description: 更新分类信息，需要管理员权限
+      parameters:
+      - description: 更新分类请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/category.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/category.Response'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新分类
+      tags:
+      - 分类
+  /api/categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定分类，需要管理员权限
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: 无效的分类ID
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除分类
+      tags:
+      - 分类
+  /api/tags:
+    get:
+      consumes:
+      - application/json
+      description: 分页获取标签列表
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/tag.ListResponse'
+              type: object
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 获取标签列表
+      tags:
+      - 标签
+    post:
+      consumes:
+      - application/json
+      description: 创建新标签，需要管理员权限
+      parameters:
+      - description: 创建标签请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/tag.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/tag.Response'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 创建标签
+      tags:
+      - 标签
+    put:
+      consumes:
+      - application/json
+      description: 更新标签信息，需要管理员权限
+      parameters:
+      - description: 更新标签请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/tag.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/tag.Response'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新标签
+      tags:
+      - 标签
+  /api/tags/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定标签，需要管理员权限
+      parameters:
+      - description: 标签ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/common.Response'
+        "400":
+          description: 无效的标签ID
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 未认证
+          schema:
+            $ref: '#/definitions/common.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除标签
+      tags:
+      - 标签
+  /api/user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据用户ID获取用户公开信息
+      parameters:
+      - description: 获取用户请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.GetUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/user.GetUserResponse'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: 获取用户信息
+      tags:
+      - 用户
+  /api/user/info:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的详细信息，需要认证
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/user.UserInfoResponse'
+              type: object
+        "401":
+          description: 用户未登录
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取当前登录用户信息
+      tags:
+      - 用户
+  /api/user/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新当前登录用户的信息，需要认证
+      parameters:
+      - description: 更新用户请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/common.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/user.UserInfoResponse'
+              type: object
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.Response'
+        "401":
+          description: 用户未登录
+          schema:
+            $ref: '#/definitions/common.Response'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新用户信息
+      tags:
+      - 用户
+swagger: "2.0"

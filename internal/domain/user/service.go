@@ -24,6 +24,17 @@ func NewUserService(biz *UserBiz, logger *log.Logger) *UserService {
 	}
 }
 
+// GetUser 获取用户信息
+// @Summary 获取用户信息
+// @Description 根据用户ID获取用户公开信息
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param request body GetUserRequest true "获取用户请求参数"
+// @Success 200 {object} common.Response{data=GetUserResponse} "获取成功"
+// @Failure 400 {object} common.Response "请求参数错误"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/user/{id} [get]
 func (s *UserService) GetUser(c *gin.Context) {
 	var req GetUserRequest
 	err := c.ShouldBindJSON(&req)
@@ -51,7 +62,17 @@ func (s *UserService) GetUser(c *gin.Context) {
 
 }
 
-// 获取当前登录用户信息
+// GetCurrentUser 获取当前登录用户信息
+// @Summary 获取当前登录用户信息
+// @Description 获取当前登录用户的详细信息，需要认证
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} common.Response{data=UserInfoResponse} "获取成功"
+// @Failure 401 {object} common.Response "用户未登录"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/user/info [get]
 func (s *UserService) GetCurrentUser(c *gin.Context) {
 	// 从上下文获取用户ID
 	userId, exists := c.Get("user_id")
@@ -79,7 +100,19 @@ func (s *UserService) GetCurrentUser(c *gin.Context) {
 	return
 }
 
-// 更新用户信息
+// UpdateUser 更新用户信息
+// @Summary 更新用户信息
+// @Description 更新当前登录用户的信息，需要认证
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body UpdateUserRequest true "更新用户请求参数"
+// @Success 200 {object} common.Response{data=UserInfoResponse} "更新成功"
+// @Failure 400 {object} common.Response "请求参数错误"
+// @Failure 401 {object} common.Response "用户未登录"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/user/update [put]
 func (s *UserService) UpdateUser(c *gin.Context) {
 	// 从上下文获取用户ID
 	userId, exists := c.Get("user_id")

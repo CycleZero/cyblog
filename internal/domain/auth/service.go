@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// AuthService 认证服务
 type AuthService struct {
 	common.BaseService
 	biz    *AuthBiz
@@ -24,7 +25,17 @@ func NewAuthService(biz *AuthBiz, logger *log.Logger) *AuthService {
 	}
 }
 
-// 用户注册
+// Register 用户注册
+// @Summary 用户注册
+// @Description 新用户注册接口，创建账号并返回用户信息和Token
+// @Tags 认证
+// @Accept json
+// @Produce json
+// @Param request body RegisterRequest true "注册请求参数"
+// @Success 200 {object} common.Response{data=RegisterResponse} "注册成功，返回用户信息和Token"
+// @Failure 400 {object} common.Response "请求参数错误"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/auth/register [post]
 func (s *AuthService) Register(c *gin.Context) {
 	var req RegisterRequest
 	err := c.ShouldBindJSON(&req)
@@ -60,7 +71,17 @@ func (s *AuthService) Register(c *gin.Context) {
 	return
 }
 
-// 用户登录
+// Login 用户登录
+// @Summary 用户登录
+// @Description 用户登录接口，支持用户名或邮箱登录，返回用户信息和Token
+// @Tags 认证
+// @Accept json
+// @Produce json
+// @Param request body LoginRequest true "登录请求参数"
+// @Success 200 {object} common.Response{data=LoginResponse} "登录成功，返回用户信息和Token"
+// @Failure 400 {object} common.Response "请求参数错误"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/auth/login [post]
 func (s *AuthService) Login(c *gin.Context) {
 	var req LoginRequest
 	err := c.ShouldBindJSON(&req)

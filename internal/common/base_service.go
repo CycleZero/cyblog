@@ -11,10 +11,17 @@ import (
 type BaseService struct {
 }
 
+// Response 通用响应结构
+// swagger:model CommonResponse
 type Response struct {
-	Code int    `json:"code"`
-	Data any    `json:"data"`
-	Msg  string `json:"msg"`
+	// 响应码
+	Code int `json:"code"`
+
+	// 响应数据
+	Data any `json:"data"`
+
+	// 响应消息
+	Msg string `json:"msg"`
 }
 
 func Success(c *gin.Context, data any) {
