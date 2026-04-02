@@ -13,7 +13,7 @@ export interface PageParams {
 export interface PageResponse<T> {
   list: T[]
   page: number
-  pageSize: number
+  page_size: number
   total: number
 }
 
@@ -28,7 +28,7 @@ export interface UserInfo extends User {
   email: string
   role: string
   status: number
-  createdAt: string
+  created_at: string
 }
 
 export interface GetUserRequest {
@@ -86,10 +86,10 @@ export interface Category {
   name: string
   slug: string
   description?: string
-  parentId?: number
+  parent_id?: number
   sort?: number
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
 }
 
 export interface CategoryListParams extends PageParams {}
@@ -100,7 +100,7 @@ export interface CreateCategoryRequest {
   name: string
   slug: string
   description?: string
-  parentId?: number
+  parent_id?: number
   sort?: number
 }
 
@@ -109,7 +109,7 @@ export interface UpdateCategoryRequest {
   name?: string
   slug?: string
   description?: string
-  parentId?: number
+  parent_id?: number
   sort?: number
 }
 
@@ -120,8 +120,8 @@ export interface Tag {
   slug: string
   color?: string
   count?: number
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
 }
 
 export interface TagListParams extends PageParams {}
@@ -148,14 +148,14 @@ export interface Article {
   slug?: string
   summary?: string
   content?: string
-  coverImage?: string
+  cover_image?: string
   status: number
-  isTop?: boolean
-  isOriginal?: boolean
+  is_top?: boolean
+  is_original?: boolean
   views: number
   likes: number
-  createdAt: string
-  updatedAt: string
+  created_at: string
+  updated_at: string
   author: User
   category?: Category
   tags: Tag[]
@@ -163,13 +163,13 @@ export interface Article {
 
 export interface ArticleListParams extends PageParams {
   keyword?: string
-  categoryId?: number
-  tagId?: number
+  category_id?: number
+  tag_id?: number
   status?: number
-  authorId?: number
-  isTop?: boolean
-  sortBy?: string
-  sortOrder?: string
+  author_id?: number
+  is_top?: boolean
+  sort_by?: string
+  sort_order?: string
 }
 
 export interface ArticleListResponse extends PageResponse<Article> {}
@@ -179,12 +179,12 @@ export interface CreateArticleRequest {
   content: string
   slug?: string
   summary?: string
-  coverImage?: string
+  cover_image?: string
   status: number
-  categoryId?: number
-  tagIds?: number[]
-  isTop?: boolean
-  isOriginal?: boolean
+  category_id?: number
+  tag_ids?: number[]
+  is_top?: boolean
+  is_original?: boolean
 }
 
 export interface UpdateArticleRequest {
@@ -193,48 +193,48 @@ export interface UpdateArticleRequest {
   content?: string
   slug?: string
   summary?: string
-  coverImage?: string
+  cover_image?: string
   status?: number
-  categoryId?: number
-  tagIds?: number[]
-  isTop?: boolean
-  isOriginal?: boolean
+  category_id?: number
+  tag_ids?: number[]
+  is_top?: boolean
+  is_original?: boolean
 }
 
 // 评论相关类型
 export interface Comment {
   id: number
-  articleId: number
-  userId: number
-  parentId?: number
+  article_id: number
+  user_id: number
+  parent_id?: number
   content: string
   likes: number
-  isLiked?: boolean
-  createdAt: string
-  updatedAt: string
+  is_liked?: boolean
+  created_at: string
+  updated_at: string
   user: User
-  replyTo?: User
+  reply_to?: User
   replies?: Comment[]
 }
 
 export interface CommentListParams extends PageParams {
-  articleId?: number
-  parentId?: number
-  sortBy?: string
-  sortOrder?: string
+  article_id?: number
+  parent_id?: number
+  sort_by?: string
+  sort_order?: string
 }
 
 export interface CommentListResponse extends PageResponse<Comment> {}
 
 export interface AdminCommentListParams extends CommentListParams {
   keyword?: string
-  userId?: number
+  user_id?: number
 }
 
 export interface CreateCommentRequest {
-  articleId: number
+  article_id: number
   content: string
-  parentId?: number
+  parent_id?: number
 }
 
 export interface UpdateCommentRequest {
@@ -243,6 +243,6 @@ export interface UpdateCommentRequest {
 }
 
 export interface ArticleCommentCountResponse {
-  articleId: number
-  commentCount: number
+  article_id: number
+  comment_count: number
 }

@@ -68,24 +68,24 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="isTop" label="置顶" width="80">
+        <el-table-column prop="is_top" label="置顶" width="80">
           <template #default="{ row }">
-            <el-tag v-if="row.isTop" type="warning">是</el-tag>
+            <el-tag v-if="row.is_top" type="warning">是</el-tag>
             <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="views" label="浏览" width="80" />
         <el-table-column prop="likes" label="点赞" width="80" />
-        <el-table-column prop="createdAt" label="创建时间" width="180">
+        <el-table-column prop="created_at" label="创建时间" width="180">
           <template #default="{ row }">
-            {{ formatDate(row.createdAt) }}
+            {{ formatDate(row.created_at) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="handleEdit(row)">编辑</el-button>
             <el-button link type="warning" @click="handleToggleTop(row)">
-              {{ row.isTop ? '取消置顶' : '置顶' }}
+              {{ row.is_top ? '取消置顶' : '置顶' }}
             </el-button>
             <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
           </template>
@@ -119,6 +119,7 @@ import {
 } from '@/api/admin'
 import { getCategories } from '@/api/category'
 import { ArticleStatusMap, ArticleStatusTypeMap } from '@/api/admin'
+import { formatDate } from '@/utils/date'
 import type { Article, Category } from '@/api/types'
 
 const router = useRouter()
@@ -126,7 +127,7 @@ const router = useRouter()
 // 查询参数
 interface QueryParams {
   keyword?: string
-  categoryId?: number
+  category_id?: number
   status?: number
   page: number
   pageSize: number
@@ -161,7 +162,7 @@ async function fetchData(): Promise<void> {
       page: queryParams.page,
       pageSize: queryParams.pageSize,
       keyword: queryParams.keyword,
-      categoryId: queryParams.categoryId,
+      category_id: queryParams.category_id,
       status: queryParams.status,
     })
     tableData.value = res.list
@@ -192,7 +193,7 @@ function handleSearch(): void {
 // 重置
 function handleReset(): void {
   queryParams.keyword = undefined
-  queryParams.categoryId = undefined
+  queryParams.category_id = undefined
   queryParams.status = undefined
   handleSearch()
 }
@@ -250,12 +251,12 @@ async function handleBatchDelete(): Promise<void> {
 async function handleToggleTop(row: Article): Promise<void> {
   try {
     await ElMessageBox.confirm(
-      row.isTop ? '确定要取消置顶吗？' : '确定要置顶吗？',
+      row.is_top ? '确定要取消置顶吗？' : '确定要置顶吗？',
       '提示',
       { type: 'warning' }
     )
-    await setArticleTop(row.id, !row.isTop)
-    ElMessage.success(row.isTop ? '已取消置顶' : '已置顶')
+    await setArticleTop(row.id, !row.is_top)
+    ElMessage.success(row.is_top ? '已取消置顶' : '已置顶')
     fetchData()
   } catch (error) {
     if (error !== 'cancel') {
@@ -281,16 +282,6 @@ function handlePageChange(page: number): void {
 // 跳转详情
 function goToDetail(id: number): void {
   router.push(`/article/${id}`)
-}
-
-// 格式化日期
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
 }
 
 // 获取状态类型

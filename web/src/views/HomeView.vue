@@ -84,7 +84,7 @@
                       {{ article.author.name }}
                     </span>
                     <span class="flex items-center gap-1.5">
-                      📅 {{ formatDate(article.createdAt) }}
+                      📅 {{ formatDate(article.created_at) }}
                     </span>
                   </div>
                   <p class="text-gray-600 line-clamp-2 mb-4">{{ article.summary }}</p>
@@ -236,6 +236,7 @@ import { useRouter } from 'vue-router'
 import { getArticles } from '@/api/article'
 import { getTags } from '@/api/tag'
 import { getCategories } from '@/api/category'
+import { formatDate } from '@/utils/date'
 import type { Article, Tag, Category } from '@/api/types'
 
 const router = useRouter()
@@ -249,15 +250,6 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
 async function fetchArticles() {
   try {
     loading.value = true
@@ -265,8 +257,8 @@ async function fetchArticles() {
       page: currentPage.value,
       pageSize: pageSize.value,
       status: 2,
-      sortBy: 'createdAt',
-      sortOrder: 'desc',
+      sort_by: 'created_at',
+      sort_order: 'desc',
     })
     articles.value = res.list
     total.value = res.total

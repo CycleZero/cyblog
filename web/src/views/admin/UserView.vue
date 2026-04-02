@@ -55,9 +55,9 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="注册时间" width="180">
+        <el-table-column prop="created_at" label="注册时间" width="180">
           <template #default="{ row }">
-            {{ formatDate(row.createdAt) }}
+            {{ formatDate(row.created_at) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
@@ -130,6 +130,7 @@ import {
   UserRoleTypeMap,
   type AdminUser,
 } from '@/api/admin'
+import { formatDate } from '@/utils/date'
 
 // 查询参数
 interface QueryParams {
@@ -270,16 +271,6 @@ function getRoleType(role: string): string {
 // 获取角色文本
 function getRoleText(role: string): string {
   return UserRoleMap[role] || '未知'
-}
-
-// 格式化日期
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
 }
 
 // 生命周期

@@ -20,8 +20,8 @@
     <!-- Article Header -->
     <article class="bg-white rounded-2xl shadow-soft overflow-hidden mb-8">
       <!-- Cover Image -->
-      <div v-if="article.coverImage" class="relative h-64 md:h-96 overflow-hidden">
-        <img :src="article.coverImage" :alt="article.title" class="w-full h-full object-cover" />
+      <div v-if="article.cover_image" class="relative h-64 md:h-96 overflow-hidden">
+        <img :src="article.cover_image" :alt="article.title" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
       </div>
 
@@ -29,13 +29,13 @@
         <!-- Tags and Badges -->
         <div class="flex flex-wrap items-center gap-2 mb-4">
           <span
-            v-if="article.isTop"
+            v-if="article.is_top"
             class="px-3 py-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-sm rounded-full font-medium"
           >
             🔝 置顶
           </span>
           <span
-            v-if="article.isOriginal"
+            v-if="article.is_original"
             class="px-3 py-1 bg-gradient-to-r from-sky-500 to-cyan-500 text-white text-sm rounded-full font-medium"
           >
             ✍️ 原创
@@ -61,7 +61,7 @@
             </div>
             <div>
               <div class="font-medium text-gray-900">{{ article.author.name }}</div>
-              <div class="text-sm text-gray-500">{{ formatDate(article.createdAt) }}</div>
+              <div class="text-sm text-gray-500">{{ formatDate(article.created_at) }}</div>
             </div>
           </div>
           <div class="flex items-center gap-4 text-sm text-gray-500">
@@ -149,7 +149,7 @@
           <div class="flex items-center gap-4 text-xs text-gray-500">
             <span>👁️ {{ related.views }}</span>
             <span>❤️ {{ related.likes }}</span>
-            <span>📅 {{ formatDate(related.createdAt) }}</span>
+            <span>📅 {{ formatDate(related.created_at) }}</span>
           </div>
         </article>
       </div>
@@ -187,6 +187,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { marked } from 'marked'
 import { getArticle, likeArticle, unlikeArticle } from '@/api/article'
+import { formatDate } from '@/utils/date'
 import type { Article } from '@/api/types'
 
 const route = useRoute()
@@ -206,15 +207,6 @@ const renderedContent = computed(() => {
   if (!article.value?.content) return ''
   return marked(article.value.content)
 })
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
 
 async function fetchArticle() {
   try {

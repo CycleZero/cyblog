@@ -49,7 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
       avatar: res.avatar,
       role: res.role,
       status: 1,
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     })
     return res
   }
@@ -64,7 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
       avatar: res.avatar,
       role: 'user',
       status: 1,
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     })
     return res
   }

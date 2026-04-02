@@ -89,13 +89,13 @@
                 <div class="flex-1">
                   <div class="flex items-center gap-2 mb-3">
                     <span
-                      v-if="article.isTop"
+                      v-if="article.is_top"
                       class="px-2 py-0.5 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs rounded-full font-medium"
                     >
                       置顶
                     </span>
                     <span
-                      v-if="article.isOriginal"
+                      v-if="article.is_original"
                       class="px-2 py-0.5 bg-gradient-to-r from-sky-500 to-cyan-500 text-white text-xs rounded-full font-medium"
                     >
                       原创
@@ -118,7 +118,7 @@
                       {{ article.author.name }}
                     </span>
                     <span class="flex items-center gap-1.5">
-                      📅 {{ formatDate(article.createdAt) }}
+                      📅 {{ formatDate(article.created_at) }}
                     </span>
                   </div>
                   <p class="text-gray-600 line-clamp-2 mb-4">{{ article.summary }}</p>
@@ -143,7 +143,7 @@
                   </div>
                 </div>
                 <div class="hidden md:block w-32 h-32 bg-gradient-to-br from-sky-100 to-cyan-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-                  <img v-if="article.coverImage" :src="article.coverImage" class="w-full h-full object-cover" alt="cover" />
+                  <img v-if="article.cover_image" :src="article.cover_image" class="w-full h-full object-cover" alt="cover" />
                   <span v-else class="text-4xl">📖</span>
                 </div>
               </div>
@@ -273,6 +273,7 @@ import { useRoute } from 'vue-router'
 import { getArticles } from '@/api/article'
 import { getTags } from '@/api/tag'
 import { getCategories } from '@/api/category'
+import { formatDate } from '@/utils/date'
 import type { Article, Tag, Category } from '@/api/types'
 
 const route = useRoute()
@@ -314,15 +315,6 @@ const visiblePages = computed(() => {
   return pages
 })
 
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
 async function fetchArticles() {
   try {
     loading.value = true
@@ -330,11 +322,11 @@ async function fetchArticles() {
       page: currentPage.value,
       pageSize: pageSize.value,
       keyword: searchKeyword.value || undefined,
-      categoryId: selectedCategory.value || undefined,
-      tagId: selectedTag.value || undefined,
+      category_id: selectedCategory.value || undefined,
+      tag_id: selectedTag.value || undefined,
       status: 2,
-      sortBy: 'createdAt',
-      sortOrder: sortOrder.value,
+      sort_by: 'created_at',
+      sort_order: sortOrder.value,
     })
     articles.value = res.list
     total.value = res.total

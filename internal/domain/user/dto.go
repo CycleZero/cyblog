@@ -136,7 +136,7 @@ type AdminUserDTO struct {
 	Status int `json:"status"`
 
 	// 创建时间
-	CreatedAt string `json:"createdAt"`
+	CreatedAt string `json:"created_at"`
 }
 
 // UpdateRoleRequest 更新角色请求

@@ -18,9 +18,9 @@
           </template>
         </el-table-column>
         <el-table-column prop="sort" label="排序" width="100" />
-        <el-table-column prop="createdAt" label="创建时间" width="180">
+        <el-table-column prop="created_at" label="创建时间" width="180">
           <template #default="{ row }">
-            {{ formatDate(row.createdAt) }}
+            {{ formatDate(row.created_at) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
@@ -70,6 +70,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { getCategories, createCategory, updateCategory, deleteCategory as deleteCategoryApi } from '@/api/category'
+import { formatDate } from '@/utils/date'
 import type { Category } from '@/api/types'
 
 // 状态
@@ -171,16 +172,6 @@ async function handleDelete(row: Category): Promise<void> {
       ElMessage.error('删除失败')
     }
   }
-}
-
-// 格式化日期
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
 }
 
 // 生命周期

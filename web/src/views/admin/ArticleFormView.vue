@@ -122,14 +122,14 @@ async function fetchArticle(): Promise<void> {
   try {
     const data = await getArticle(Number(articleId.value))
     form.title = data.title
-    form.coverImage = data.coverImage || ''
-    form.summary = data.summary || ''
-    form.content = data.content || ''
-    form.categoryId = data.category?.id
-    form.tagIds = data.tags?.map((t) => t.id) || []
-    form.status = data.status
-    form.isTop = data.isTop || false
-    form.isOriginal = data.isOriginal || false
+    form.coverImage = (data as any).cover_image || ''
+    form.summary = (data as any).summary || ''
+    form.content = (data as any).content || ''
+    form.categoryId = (data as any).category?.id
+    form.tagIds = (data as any).tags?.map((t: any) => t.id) || []
+    form.status = (data as any).status
+    form.isTop = (data as any).is_top || false
+    form.isOriginal = (data as any).is_original || false
   } catch {
     ElMessage.error('获取文章详情失败')
   }

@@ -116,9 +116,9 @@ func NewLogger(vc *viper.Viper) (*Logger, error) {
 		fileAsyncWriter := NewAsyncWriter(fileWriter)
 		fileWriteSyncer = zapcore.AddSync(fileAsyncWriter)
 
-		InitGlobalLogWriter(consoleWriter, fileAsyncWriter)
+		InitGlobalLogWriter(os.Stdout, fileAsyncWriter)
 	} else {
-		InitGlobalLogWriter(consoleWriter, nil)
+		InitGlobalLogWriter(os.Stdout, nil)
 	}
 
 	// 创建多个 core

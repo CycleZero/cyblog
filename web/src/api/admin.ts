@@ -2,6 +2,7 @@
  * 后台管理 API
  */
 import request from './request'
+import type { Article, PageResponse } from './types'
 
 // ============== 类型定义 ==============
 
@@ -89,7 +90,7 @@ export function getDashboard(): Promise<DashboardResponse> {
 /** 文章列表查询参数 */
 export interface AdminArticleParams {
   keyword?: string
-  categoryId?: number
+  category_id?: number
   status?: number
   page?: number
   pageSize?: number
@@ -98,20 +99,20 @@ export interface AdminArticleParams {
 /**
  * 管理端获取文章列表
  */
-export function getAdminArticles(params: AdminArticleParams): Promise<any> {
+export function getAdminArticles(params: AdminArticleParams): Promise<PageResponse<Article>> {
   return request.get('/admin/articles', { params })
 }
 
 /** 置顶请求 */
 export interface SetTopRequest {
-  isTop: boolean
+  is_top: boolean
 }
 
 /**
  * 置顶/取消置顶文章
  */
 export function setArticleTop(id: number, isTop: boolean): Promise<void> {
-  return request.put(`/admin/articles/${id}/top`, { isTop } as SetTopRequest)
+  return request.put(`/admin/articles/${id}/top`, { is_top: isTop })
 }
 
 /** 批量删除请求 */
@@ -123,7 +124,7 @@ export interface BatchDeleteRequest {
  * 批量删除文章
  */
 export function batchDeleteArticles(ids: number[]): Promise<void> {
-  return request.post('/admin/articles/batch-delete', { ids } as BatchDeleteRequest)
+  return request.post('/admin/articles/batch-delete', { ids })
 }
 
 /** 批量更新状态请求 */
@@ -136,7 +137,7 @@ export interface BatchUpdateStatusRequest {
  * 批量更新文章状态
  */
 export function batchUpdateArticleStatus(ids: number[], status: number): Promise<void> {
-  return request.put('/admin/articles/batch-status', { ids, status } as BatchUpdateStatusRequest)
+  return request.put('/admin/articles/batch-status', { ids, status })
 }
 
 // ============== 评论管理 ==============
@@ -144,10 +145,10 @@ export function batchUpdateArticleStatus(ids: number[], status: number): Promise
 /** 评论列表查询参数 */
 export interface AdminCommentParams {
   keyword?: string
-  articleId?: number
-  userId?: number
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
+  article_id?: number
+  user_id?: number
+  sort_by?: string
+  sort_order?: 'asc' | 'desc'
   page?: number
   pageSize?: number
 }
@@ -155,7 +156,7 @@ export interface AdminCommentParams {
 /**
  * 管理端获取评论列表
  */
-export function getAdminComments(params: AdminCommentParams): Promise<any> {
+export function getAdminComments(params: AdminCommentParams): Promise<unknown> {
   return request.get('/admin/comments', { params })
 }
 
@@ -176,7 +177,7 @@ export interface AdminUser {
   avatar: string
   role: string
   status: number
-  createdAt: string
+  created_at: string
 }
 
 /** 用户列表响应 */
@@ -216,14 +217,14 @@ export function getAdminUsers(params: AdminUserParams): Promise<AdminUserListRes
  * 更新用户角色
  */
 export function updateUserRole(id: number, role: string): Promise<void> {
-  return request.put(`/admin/users/${id}/role`, { role } as UpdateRoleRequest)
+  return request.put(`/admin/users/${id}/role`, { role })
 }
 
 /**
  * 更新用户状态
  */
 export function updateUserStatus(id: number, status: number): Promise<void> {
-  return request.put(`/admin/users/${id}/status`, { status } as UpdateStatusRequest)
+  return request.put(`/admin/users/${id}/status`, { status })
 }
 
 // ============== 系统设置 ==============
