@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import ContentLayout from './components/layout/ContentLayout.vue'
 </script>
 
 <template>
-  <RouterView />
+  <ContentLayout>
+    <RouterView />
+  </ContentLayout>
 </template>
 
 <style>

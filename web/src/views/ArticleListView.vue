@@ -1,50 +1,70 @@
 <template>
-  <!-- Hero Section - 清新天蓝色风格 -->
-  <section class="relative py-24 px-4 overflow-hidden">
-    <div class="max-w-7xl mx-auto text-center relative z-10">
-      <div class="animate-bounce-in">
-        <span class="inline-block px-6 py-2 bg-gradient-to-r from-sky-100 to-cyan-100 text-sky-700 rounded-full text-sm font-medium mb-6">
-          ✨ 欢迎来到 Cyblog
-        </span>
-      </div>
-      <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in-up">
-        <span class="bg-gradient-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
-          分享技术，记录生活
-        </span>
-      </h1>
-      <p class="text-xl md:text-2xl text-gray-600 mb-10 animate-fade-in-up" style="animation-delay: 0.2s;">
-        🌊 在这里，发现精彩文章，与志同道合的朋友一起成长
-      </p>
-      <div class="flex justify-center gap-4 animate-fade-in-up" style="animation-delay: 0.4s;">
-        <router-link to="/article" class="px-8 py-3 bg-gradient-to-r from-sky-500 to-cyan-500 text-white rounded-full font-medium hover:shadow-xl hover:shadow-cyan-500/30 transition-all duration-300 transform hover:scale-105">
-          🚀 探索文章
-        </router-link>
-        <router-link to="/register" class="px-8 py-3 bg-white text-sky-600 rounded-full font-medium border-2 border-sky-200 hover:border-sky-400 transition-all duration-300">
-          💫 加入我们
-        </router-link>
-      </div>
-    </div>
-    <!-- 装饰性波浪 -->
-    <div class="absolute bottom-0 left-0 w-full">
-      <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white" fill-opacity="0.5"/>
-      </svg>
-    </div>
-  </section>
-
   <!-- Main Content -->
   <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
     <div class="flex gap-8">
       <!-- Article List -->
       <div class="flex-1">
-        <div class="flex items-center justify-between mb-8">
-          <h2 class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-            📚 最新文章
+        <!-- 搜索和筛选 -->
+        <div class="bg-white rounded-2xl shadow-soft p-6 mb-8 border border-gray-100">
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1 relative">
+              <input
+                v-model="searchKeyword"
+                type="text"
+                placeholder="搜索文章..."
+                class="w-full px-4 py-3 pl-12 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                @keyup.enter="handleSearch"
+              />
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            </div>
+            <select
+              v-model="selectedCategory"
+              class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent cursor-pointer"
+              @change="handleCategoryChange"
+            >
+              <option value="">全部分类</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                {{ cat.name }}
+              </option>
+            </select>
+            <select
+              v-model="selectedTag"
+              class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent cursor-pointer"
+              @change="handleTagChange"
+            >
+              <option value="">全部标签</option>
+              <option v-for="tag in tags" :key="tag.id" :value="tag.id">
+                {{ tag.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-800">
+            📚 文章列表
+            <span class="text-sm font-normal text-gray-500 ml-2">共 {{ total }} 篇</span>
           </h2>
-          <router-link to="/article" class="text-sky-600 hover:text-cyan-600 font-medium flex items-center gap-1 transition-colors">
-            查看全部
-            <span>→</span>
-          </router-link>
+          <div class="flex items-center gap-2">
+            <button
+              @click="sortOrder = 'desc'"
+              :class="[
+                'px-4 py-2 rounded-lg font-medium transition-all',
+                sortOrder === 'desc' ? 'bg-sky-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ]"
+            >
+              最新
+            </button>
+            <button
+              @click="sortOrder = 'asc'"
+              :class="[
+                'px-4 py-2 rounded-lg font-medium transition-all',
+                sortOrder === 'asc' ? 'bg-sky-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ]"
+            >
+              最旧
+            </button>
+          </div>
         </div>
 
         <div v-if="loading" class="space-y-6">
@@ -67,6 +87,20 @@
             >
               <div class="flex items-start gap-4">
                 <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-3">
+                    <span
+                      v-if="article.is_top"
+                      class="px-2 py-0.5 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs rounded-full font-medium"
+                    >
+                      置顶
+                    </span>
+                    <span
+                      v-if="article.is_original"
+                      class="px-2 py-0.5 bg-gradient-to-r from-sky-500 to-cyan-500 text-white text-xs rounded-full font-medium"
+                    >
+                      原创
+                    </span>
+                  </div>
                   <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-sky-600 group-hover:to-cyan-600 group-hover:bg-clip-text transition-all duration-300">
                     {{ article.title }}
                   </h3>
@@ -108,8 +142,9 @@
                     </div>
                   </div>
                 </div>
-                <div class="hidden md:block w-24 h-24 bg-gradient-to-br from-sky-100 to-cyan-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <span class="text-4xl">📖</span>
+                <div class="hidden md:block w-32 h-32 bg-gradient-to-br from-sky-100 to-cyan-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+                  <img v-if="article.cover_image" :src="article.cover_image" class="w-full h-full object-cover" alt="cover" />
+                  <span v-else class="text-4xl">📖</span>
                 </div>
               </div>
             </article>
@@ -124,13 +159,23 @@
             >
               ← 上一页
             </button>
-            <div class="px-4 py-2 bg-gradient-to-r from-sky-100 to-cyan-100 rounded-full">
-              <span class="text-sky-700 font-medium">
-                {{ currentPage }} / {{ Math.ceil(total / pageSize) }}
-              </span>
+            <div class="flex items-center gap-2">
+              <button
+                v-for="page in visiblePages"
+                :key="page"
+                @click="currentPage = page, fetchArticles()"
+                :class="[
+                  'w-10 h-10 rounded-full transition-all duration-300',
+                  currentPage === page
+                    ? 'bg-gradient-to-r from-sky-500 to-cyan-500 text-white shadow-lg'
+                    : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-sky-400'
+                ]"
+              >
+                {{ page }}
+              </button>
             </div>
             <button
-              :disabled="currentPage >= Math.ceil(total / pageSize)"
+              :disabled="currentPage >= totalPages"
               @click="currentPage++, fetchArticles()"
               class="px-5 py-2.5 bg-white border-2 border-gray-200 rounded-full hover:border-sky-400 hover:text-sky-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             >
@@ -143,14 +188,14 @@
               <span class="text-5xl">📝</span>
             </div>
             <p class="text-gray-500 text-xl font-medium">暂无文章</p>
-            <p class="text-gray-400 mt-2">快来发布第一篇文章吧~</p>
+            <p class="text-gray-400 mt-2">换个关键词试试吧~</p>
           </div>
         </template>
       </div>
 
       <!-- Sidebar -->
       <aside class="w-80 hidden lg:block space-y-6">
-        <!-- Tags -->
+        <!-- 热门标签 -->
         <div class="bg-white rounded-2xl shadow-soft p-6 border border-gray-100 hover:border-sky-200 transition-colors">
           <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <span class="w-8 h-8 bg-gradient-to-br from-sky-500 to-cyan-500 rounded-lg flex items-center justify-center text-white">
@@ -165,8 +210,13 @@
             <button
               v-for="tag in tags"
               :key="tag.id"
-              @click="goToArticleByTag(tag.id)"
-              class="px-4 py-2 bg-gradient-to-r from-sky-50 to-cyan-50 text-sky-700 rounded-full text-sm font-medium hover:from-sky-100 hover:to-cyan-100 hover:shadow-md transition-all duration-300 transform hover:scale-105"
+              @click="selectTag(tag.id)"
+              :class="[
+                'px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105',
+                selectedTag === tag.id
+                  ? 'bg-gradient-to-r from-sky-500 to-cyan-500 text-white shadow-md'
+                  : 'bg-gradient-to-r from-sky-50 to-cyan-50 text-sky-700 hover:from-sky-100 hover:to-cyan-100'
+              ]"
             >
               #{{ tag.name }} ({{ tag.count }})
             </button>
@@ -177,7 +227,7 @@
           </div>
         </div>
 
-        <!-- Categories -->
+        <!-- 分类 -->
         <div class="bg-white rounded-2xl shadow-soft p-6 border border-gray-100 hover:border-teal-200 transition-colors">
           <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <span class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-lg flex items-center justify-center text-white">
@@ -186,20 +236,24 @@
             分类
           </h3>
           <div v-if="categoriesLoading" class="space-y-2">
-            <div
-              v-for="i in 5"
-              :key="i"
-              class="h-10 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-lg animate-pulse"
-            ></div>
+            <div v-for="i in 5" :key="i" class="h-10 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-lg animate-pulse"></div>
           </div>
           <div v-else-if="categories.length > 0" class="space-y-2">
             <button
-              v-for="(category, index) in categories"
+              v-for="category in categories"
               :key="category.id"
-              @click="goToArticleByCategory(category.id)"
-              class="w-full text-left px-4 py-3 bg-gradient-to-r from-gray-50 to-white text-gray-700 rounded-xl hover:from-cyan-50 hover:to-teal-50 hover:text-cyan-700 transition-all duration-300 flex items-center gap-3 group"
+              @click="selectCategory(category.id)"
+              :class="[
+                'w-full text-left px-4 py-3 rounded-xl transition-all duration-300 flex items-center gap-3 group',
+                selectedCategory === category.id
+                  ? 'bg-gradient-to-r from-cyan-50 to-teal-50 text-cyan-700'
+                  : 'bg-gradient-to-r from-gray-50 to-white text-gray-700 hover:from-cyan-50 hover:to-teal-50'
+              ]"
             >
-              <span class="w-2 h-2 bg-gradient-to-r from-cyan-400 to-teal-400 rounded-full group-hover:w-3 transition-all"></span>
+              <span :class="[
+                'w-2 h-2 rounded-full transition-all',
+                selectedCategory === category.id ? 'bg-gradient-to-r from-cyan-400 to-teal-400 w-3' : 'bg-gradient-to-r from-cyan-400 to-teal-400'
+              ]"></span>
               {{ category.name }}
             </button>
           </div>
@@ -208,37 +262,21 @@
             <p class="mt-2">暂无分类</p>
           </div>
         </div>
-
-        <!-- 快捷链接 -->
-        <div class="bg-gradient-to-br from-sky-500 to-cyan-500 rounded-2xl shadow-lg p-6 text-white">
-          <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-            ✨ 快捷链接
-          </h3>
-          <div class="space-y-3">
-            <router-link to="/article" class="flex items-center gap-3 p-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors">
-              <span class="text-xl">📝</span>
-              <span>浏览全部文章</span>
-            </router-link>
-            <router-link to="/register" class="flex items-center gap-3 p-3 bg-white/20 rounded-xl hover:bg-white/30 transition-colors">
-              <span class="text-xl">💫</span>
-              <span>加入我们</span>
-            </router-link>
-          </div>
-        </div>
       </aside>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { getArticles } from '@/api/article'
 import { getTags } from '@/api/tag'
 import { getCategories } from '@/api/category'
 import type { Article, Tag, Category } from '@/api/types'
 
-const router = useRouter()
+const route = useRoute()
+
 const articles = ref<Article[]>([])
 const tags = ref<Tag[]>([])
 const categories = ref<Category[]>([])
@@ -248,6 +286,33 @@ const categoriesLoading = ref(true)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+const searchKeyword = ref('')
+const selectedCategory = ref<number | ''>('')
+const selectedTag = ref<number | ''>('')
+const sortOrder = ref('desc')
+
+const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
+
+const visiblePages = computed(() => {
+  const pages = []
+  const total = totalPages.value
+  const current = currentPage.value
+  let start = Math.max(1, current - 2)
+  let end = Math.min(total, current + 2)
+
+  if (end - start < 4) {
+    if (start === 1) {
+      end = Math.min(total, start + 4)
+    } else {
+      start = Math.max(1, end - 4)
+    }
+  }
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  return pages
+})
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
@@ -264,9 +329,12 @@ async function fetchArticles() {
     const res = await getArticles({
       page: currentPage.value,
       page_size: pageSize.value,
+      keyword: searchKeyword.value || undefined,
+      category_id: selectedCategory.value || undefined,
+      tag_id: selectedTag.value || undefined,
       status: 2,
       sort_by: 'created_at',
-      sort_order: 'desc',
+      sort_order: sortOrder.value,
     })
     articles.value = res.list
     total.value = res.total
@@ -280,7 +348,7 @@ async function fetchArticles() {
 async function fetchTags() {
   try {
     tagsLoading.value = true
-    const res = await getTags({ page: 1, page_size: 20 })
+    const res = await getTags({ page: 1, page_size: 50 })
     tags.value = res.list
   } catch (error) {
     console.error('获取标签失败', error)
@@ -292,7 +360,7 @@ async function fetchTags() {
 async function fetchCategories() {
   try {
     categoriesLoading.value = true
-    const res = await getCategories({ page: 1, page_size: 20 })
+    const res = await getCategories({ page: 1, page_size: 50 })
     categories.value = res.list
   } catch (error) {
     console.error('获取分类失败', error)
@@ -301,59 +369,65 @@ async function fetchCategories() {
   }
 }
 
-function goToArticleByTag(tagId: number) {
-  router.push(`/article?tag_id=${tagId}`)
+function handleSearch() {
+  currentPage.value = 1
+  fetchArticles()
 }
 
-function goToArticleByCategory(categoryId: number) {
-  router.push(`/article?category_id=${categoryId}`)
+function handleCategoryChange() {
+  currentPage.value = 1
+  fetchArticles()
 }
+
+function handleTagChange() {
+  currentPage.value = 1
+  fetchArticles()
+}
+
+function selectCategory(categoryId: number) {
+  if (selectedCategory.value === categoryId) {
+    selectedCategory.value = ''
+  } else {
+    selectedCategory.value = categoryId
+  }
+  currentPage.value = 1
+  fetchArticles()
+}
+
+function selectTag(tagId: number) {
+  if (selectedTag.value === tagId) {
+    selectedTag.value = ''
+  } else {
+    selectedTag.value = tagId
+  }
+  currentPage.value = 1
+  fetchArticles()
+}
+
+watch(
+  () => route.query,
+  (query) => {
+    if (query.category_id) {
+      selectedCategory.value = Number(query.category_id)
+    }
+    if (query.tag_id) {
+      selectedTag.value = Number(query.tag_id)
+    }
+    fetchArticles()
+  },
+  { immediate: true }
+)
 
 onMounted(() => {
+  if (route.query.category_id) {
+    selectedCategory.value = Number(route.query.category_id)
+  }
+  if (route.query.tag_id) {
+    selectedTag.value = Number(route.query.tag_id)
+  }
+
   fetchArticles()
   fetchTags()
   fetchCategories()
 })
 </script>
-
-<style scoped>
-/* 自定义动画 */
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(5deg); }
-}
-
-@keyframes gradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-@keyframes fadeInUp {
-  0% { opacity: 0; transform: translateY(30px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes bounceIn {
-  0% { opacity: 0; transform: scale(0.3); }
-  50% { transform: scale(1.05); }
-  70% { transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-gradient {
-  background-size: 200% auto;
-  animation: gradient 8s ease infinite;
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
-}
-
-.animate-bounce-in {
-  animation: bounceIn 0.8s ease-out forwards;
-}
-</style>

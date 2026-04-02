@@ -1,5 +1,5 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
-import { getToken, removeToken } from '@/utils/auth'
+import { getToken, removeToken, removeUserInfo } from '@/utils/auth'
 import router from '@/router'
 
 // 后端统一响应接口（泛型默认值用 unknown，替代 any，符合ESLint）
@@ -46,6 +46,7 @@ request.interceptors.response.use(
       if (status === 401) {
         console.error('登录已过期，请重新登录')
         removeToken()
+        removeUserInfo()
         router.push('/login')
       } else if (status === 403) {
         console.error('无权限操作')
