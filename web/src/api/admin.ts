@@ -89,10 +89,10 @@ export function getDashboard(): Promise<DashboardResponse> {
 /** 文章列表查询参数 */
 export interface AdminArticleParams {
   keyword?: string
-  category_id?: number
+  categoryId?: number
   status?: number
   page?: number
-  page_size?: number
+  pageSize?: number
 }
 
 /**
@@ -104,14 +104,14 @@ export function getAdminArticles(params: AdminArticleParams): Promise<any> {
 
 /** 置顶请求 */
 export interface SetTopRequest {
-  is_top: boolean
+  isTop: boolean
 }
 
 /**
  * 置顶/取消置顶文章
  */
 export function setArticleTop(id: number, isTop: boolean): Promise<void> {
-  return request.put(`/admin/articles/${id}/top`, { is_top: isTop } as SetTopRequest)
+  return request.put(`/admin/articles/${id}/top`, { isTop } as SetTopRequest)
 }
 
 /** 批量删除请求 */
@@ -144,12 +144,12 @@ export function batchUpdateArticleStatus(ids: number[], status: number): Promise
 /** 评论列表查询参数 */
 export interface AdminCommentParams {
   keyword?: string
-  article_id?: number
-  user_id?: number
-  sort_by?: string
-  sort_order?: 'asc' | 'desc'
+  articleId?: number
+  userId?: number
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
   page?: number
-  page_size?: number
+  pageSize?: number
 }
 
 /**
@@ -192,7 +192,7 @@ export interface AdminUserParams {
   role?: string
   status?: number
   page?: number
-  page_size?: number
+  pageSize?: number
 }
 
 /** 更新角色请求 */

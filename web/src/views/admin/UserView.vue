@@ -136,7 +136,7 @@ interface QueryParams {
   keyword?: string
   role?: string
   page?: number
-  page_size?: number
+  pageSize?: number
 }
 
 interface Pagination {
@@ -150,7 +150,7 @@ const loading = ref(false)
 const tableData = ref<AdminUser[]>([])
 const queryParams = reactive<QueryParams>({
   page: 1,
-  page_size: 10,
+  pageSize: 10,
 })
 const pagination = reactive<Pagination>({
   page: 1,
@@ -171,7 +171,7 @@ async function fetchData(): Promise<void> {
   try {
     const res = await getAdminUsers({
       page: queryParams.page,
-      page_size: queryParams.pageSize,
+      pageSize: queryParams.pageSize,
       keyword: queryParams.keyword,
       role: queryParams.role,
     })
@@ -251,7 +251,7 @@ async function handleToggleStatus(row: AdminUser): Promise<void> {
 // 分页大小变化
 function handleSizeChange(size: number): void {
   pagination.pageSize = size
-  queryParams.page_size = size
+  queryParams.pageSize = size
   fetchData()
 }
 

@@ -1,12 +1,2 @@
-import VMdEditor from '@kangc/v-md-editor'
-import '@kangc/v-md-editor/lib/style/base-editor.css'
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js'
-import '@kangc/v-md-editor/lib/theme/style/github.css'
-import Prism from 'prismjs'
-
-// 配置主题（全局只执行一次）
-VMdEditor.use(githubTheme, {
-  Prism,
-})
-
-export default VMdEditor
+// md-editor-v3 不需要全局配置，直接在组件中导入使用
+// 保留此文件以保持项目结构一致性

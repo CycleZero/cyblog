@@ -24,3 +24,4 @@ dist
 dist-ssr
 
 .env.development
+.env.production

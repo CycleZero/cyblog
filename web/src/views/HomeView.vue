@@ -84,7 +84,7 @@
                       {{ article.author.name }}
                     </span>
                     <span class="flex items-center gap-1.5">
-                      📅 {{ formatDate(article.created_at) }}
+                      📅 {{ formatDate(article.createdAt) }}
                     </span>
                   </div>
                   <p class="text-gray-600 line-clamp-2 mb-4">{{ article.summary }}</p>
@@ -263,10 +263,10 @@ async function fetchArticles() {
     loading.value = true
     const res = await getArticles({
       page: currentPage.value,
-      page_size: pageSize.value,
+      pageSize: pageSize.value,
       status: 2,
-      sort_by: 'created_at',
-      sort_order: 'desc',
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     })
     articles.value = res.list
     total.value = res.total
@@ -280,7 +280,7 @@ async function fetchArticles() {
 async function fetchTags() {
   try {
     tagsLoading.value = true
-    const res = await getTags({ page: 1, page_size: 20 })
+    const res = await getTags({ page: 1, pageSize: 20 })
     tags.value = res.list
   } catch (error) {
     console.error('获取标签失败', error)
@@ -292,7 +292,7 @@ async function fetchTags() {
 async function fetchCategories() {
   try {
     categoriesLoading.value = true
-    const res = await getCategories({ page: 1, page_size: 20 })
+    const res = await getCategories({ page: 1, pageSize: 20 })
     categories.value = res.list
   } catch (error) {
     console.error('获取分类失败', error)

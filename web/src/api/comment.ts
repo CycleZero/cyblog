@@ -19,7 +19,7 @@ export function getComments(
 // 获取评论的回复列表
 export function getCommentReplies(
   id: number,
-  params?: { page?: number; page_size?: number }
+  params?: { page?: number; pageSize?: number }
 ): Promise<CommentListResponse> {
   return request.get(`/comments/${id}/replies`, { params })
 }

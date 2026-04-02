@@ -115,7 +115,7 @@ import {
   getAdminArticles,
   setArticleTop,
   batchDeleteArticles,
-  deleteArticle as deleteArticleApi,
+  // deleteArticle as deleteArticleApi,
 } from '@/api/admin'
 import { getCategories } from '@/api/category'
 import { ArticleStatusMap, ArticleStatusTypeMap } from '@/api/admin'
@@ -126,10 +126,10 @@ const router = useRouter()
 // 查询参数
 interface QueryParams {
   keyword?: string
-  category_id?: number
+  categoryId?: number
   status?: number
   page: number
-  page_size: number
+  pageSize: number
 }
 
 interface Pagination {
@@ -145,7 +145,7 @@ const selectedRows = ref<Article[]>([])
 const categories = ref<Category[]>([])
 const queryParams = reactive<QueryParams>({
   page: 1,
-  page_size: 10,
+  pageSize: 10,
 })
 const pagination = reactive<Pagination>({
   page: 1,
@@ -159,9 +159,9 @@ async function fetchData(): Promise<void> {
   try {
     const res = await getAdminArticles({
       page: queryParams.page,
-      page_size: queryParams.pageSize,
+      pageSize: queryParams.pageSize,
       keyword: queryParams.keyword,
-      category_id: queryParams.category_id,
+      categoryId: queryParams.categoryId,
       status: queryParams.status,
     })
     tableData.value = res.list
@@ -192,7 +192,7 @@ function handleSearch(): void {
 // 重置
 function handleReset(): void {
   queryParams.keyword = undefined
-  queryParams.category_id = undefined
+  queryParams.categoryId = undefined
   queryParams.status = undefined
   handleSearch()
 }
@@ -267,7 +267,7 @@ async function handleToggleTop(row: Article): Promise<void> {
 // 分页大小变化
 function handleSizeChange(size: number): void {
   pagination.pageSize = size
-  queryParams.page_size = size
+  queryParams.pageSize = size
   fetchData()
 }
 
