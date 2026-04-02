@@ -15,7 +15,6 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 	"go.uber.org/zap/zapcore"
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var ColorResetStr = "\x1b[0m"
@@ -116,6 +115,10 @@ func NewLogger(vc *viper.Viper) (*Logger, error) {
 		fileWriter := NewFileWriter(logPath)
 		fileAsyncWriter := NewAsyncWriter(fileWriter)
 		fileWriteSyncer = zapcore.AddSync(fileAsyncWriter)
+
+		InitGlobalLogWriter(consoleWriter, fileAsyncWriter)
+	} else {
+		InitGlobalLogWriter(consoleWriter, nil)
 	}
 
 	// 创建多个 core
@@ -210,21 +213,6 @@ func SugaredLogger() *zap.SugaredLogger {
 
 func SetGlobalLogger(l *Logger) {
 	globalLogger = l
-}
-
-func GetLogPath(logDir string) string {
-	if logDir == "" {
-		return ""
-	}
-	p := logDir + "/" + time.Now().Format("2006-01-02") + "/" + time.Now().Format("2006-01-02-15-04-05") + ".log"
-	return p
-}
-
-func NewFileWriter(logPath string) *lumberjack.Logger {
-	return &lumberjack.Logger{
-		Filename: logPath,
-		MaxSize:  10, // megabytes
-	}
 }
 
 func NewAsyncWriter(w io.Writer) *law.WriteAsyncer {

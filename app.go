@@ -35,7 +35,7 @@ func NewMainApp(
 	gin.SetMode(gin.DebugMode)
 
 	e := gin.New()
-	e.Use(gin.Logger())
+	e.Use(gin.LoggerWithWriter(log.GetLogWriter()))
 	e.Use(gin.CustomRecovery(func(c *gin.Context, err any) {
 		log.SugaredLogger().Error("发生Panic!")
 		log.SugaredLogger().Error(err)
