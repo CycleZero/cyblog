@@ -1,12 +1,10 @@
-<script setup lang="ts">
-import ContentLayout from './components/layout/ContentLayout.vue'
-</script>
-
 <template>
-  <ContentLayout>
-    <RouterView />
-  </ContentLayout>
+  <RouterView />
 </template>
+
+<script setup lang="ts">
+// 全局应用组件，不使用任何布局
+</script>
 
 <style>
 #app {

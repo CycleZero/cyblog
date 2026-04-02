@@ -29,6 +29,9 @@ func RegisterRouter(root gin.IRouter, serviceHub *domain.ServiceHub) {
 	RegisterCategoryRoutes(apiGroup, serviceHub.CategoryService)
 	RegisterTagRoutes(apiGroup, serviceHub.TagService)
 	RegisterArticleRoutes(apiGroup, serviceHub.ArticleService)
+
+	// 注册管理端路由
+	RegisterAdminRoutes(apiGroup, serviceHub)
 }
 
 func RegisterUserRoutes(api gin.IRouter, userService *user.UserService) {

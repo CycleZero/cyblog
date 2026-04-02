@@ -487,3 +487,87 @@ func convertToResponse(article *model.Article) *Response {
 
 	return resp
 }
+
+// AdminList 管理端获取文章列表
+func (biz *ArticleBiz) AdminList(ctx context.Context, query *ListQuery) (*ListResponse, error) {
+	articles, total, err := biz.articleRepo.List(ctx, query)
+	if err != nil {
+		return nil, errs.Wrap(http.StatusInternalServerError, "获取文章列表失败", err)
+	}
+	var list []*Response
+	for _, article := range articles {
+		list = append(list, convertToResponse(article))
+	}
+	return &ListResponse{
+		PageInfo: dto.PageInfo{
+			Total:    int(total),
+			Page:     query.Page,
+			PageSize: query.PageSize,
+		},
+		List: list,
+	}, nil
+}
+
+// SetTop 置顶/取消置顶文章
+func (biz *ArticleBiz) SetTop(ctx context.Context, id uint, isTop bool) error {
+	article, err := biz.articleRepo.GetByID(ctx, id)
+	if err != nil {
+		return errs.New(http.StatusNotFound, "文章不存在")
+	}
+	article.IsTop = isTop
+	return biz.articleRepo.Update(ctx, article)
+}
+
+// BatchDelete 批量删除文章
+func (biz *ArticleBiz) BatchDelete(ctx context.Context, ids []uint) error {
+	for _, id := range ids {
+		_ = biz.Delete(ctx, id)
+	}
+	return nil
+}
+
+// BatchUpdateStatus 批量更新文章状态
+func (biz *ArticleBiz) BatchUpdateStatus(ctx context.Context, ids []uint, status int) error {
+	for _, id := range ids {
+		article, err := biz.articleRepo.GetByID(ctx, id)
+		if err != nil {
+			continue
+		}
+		article.Status = status
+		_ = biz.articleRepo.Update(ctx, article)
+	}
+	return nil
+}
+
+// GetDashboard 获取仪表盘数据
+func (biz *ArticleBiz) GetDashboard(ctx context.Context) (*DashboardResponse, error) {
+	articleCount, _ := biz.articleRepo.Count(ctx)
+	todayViews, _ := biz.articleRepo.GetTodayViews(ctx)
+	recentArticles, _ := biz.articleRepo.GetRecent(ctx, 10)
+	hotArticles, _ := biz.articleRepo.GetHot(ctx, 10)
+
+	recentList := make([]RecentArticleSimple, 0, len(recentArticles))
+	for _, a := range recentArticles {
+		recentList = append(recentList, RecentArticleSimple{
+			ID:     a.ID,
+			Title:  a.Title,
+			Status: a.Status,
+		})
+	}
+
+	hotList := make([]HotArticleSimple, 0, len(hotArticles))
+	for _, a := range hotArticles {
+		hotList = append(hotList, HotArticleSimple{
+			ID:    a.ID,
+			Title: a.Title,
+			Views: a.Views,
+		})
+	}
+
+	return &DashboardResponse{
+		ArticleCount:   articleCount,
+		TodayViews:     todayViews,
+		RecentArticles: recentList,
+		HotArticles:    hotList,
+	}, nil
+}

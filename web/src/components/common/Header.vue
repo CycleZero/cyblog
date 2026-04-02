@@ -86,6 +86,15 @@
                     <p class="text-sm font-medium text-gray-900">{{ authStore.userInfo?.name }}</p>
                     <p class="text-xs text-gray-500 truncate">{{ authStore.userInfo?.email }}</p>
                   </div>
+                  <!-- 管理界面入口（仅管理员可见） -->
+                  <button
+                    v-if="authStore.userInfo?.role === 'admin'"
+                    @click="goToAdmin"
+                    class="w-full text-left px-4 py-2.5 text-sm text-sky-600 hover:bg-sky-50 transition-colors flex items-center gap-2"
+                  >
+                    <span>⚙️</span>
+                    管理界面
+                  </button>
                   <button
                     @click="handleLogout"
                     class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
@@ -121,6 +130,11 @@ function handleLogout() {
   authStore.logout()
   showUserMenu.value = false
   router.push('/')
+}
+
+function goToAdmin(): void {
+  showUserMenu.value = false
+  router.push('/admin')
 }
 
 // 点击外部关闭菜单

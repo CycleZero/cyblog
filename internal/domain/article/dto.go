@@ -196,7 +196,71 @@ type Response struct {
 // swagger:model ArticleListResponse
 type ListResponse struct {
 	dto.PageInfo
-
-	// 文章列表
 	List []*Response `json:"list"`
+}
+
+// DashboardResponse 仪表盘响应
+// swagger:model DashboardResponse
+type DashboardResponse struct {
+	// 文章总数
+	ArticleCount int64 `json:"articleCount"`
+
+	// 今日浏览量
+	TodayViews int64 `json:"todayViews"`
+
+	// 近期文章
+	RecentArticles []RecentArticleSimple `json:"recentArticles"`
+
+	// 热门文章
+	HotArticles []HotArticleSimple `json:"hotArticles"`
+}
+
+// RecentArticleSimple 近期文章（简化）
+// swagger:model RecentArticleSimple
+type RecentArticleSimple struct {
+	// 文章ID
+	ID uint `json:"id"`
+
+	// 标题
+	Title string `json:"title"`
+
+	// 状态
+	Status int `json:"status"`
+}
+
+// HotArticleSimple 热门文章（简化）
+// swagger:model HotArticleSimple
+type HotArticleSimple struct {
+	// 文章ID
+	ID uint `json:"id"`
+
+	// 标题
+	Title string `json:"title"`
+
+	// 浏览量
+	Views int `json:"views"`
+}
+
+// SetTopRequest 设置置顶请求
+// swagger:model SetTopRequest
+type SetTopRequest struct {
+	// 是否置顶
+	IsTop bool `json:"is_top"`
+}
+
+// BatchDeleteRequest 批量删除请求
+// swagger:model BatchDeleteRequest
+type BatchDeleteRequest struct {
+	// 文章ID列表
+	IDs []uint `json:"ids" binding:"required,min=1"`
+}
+
+// BatchUpdateStatusRequest 批量更新状态请求
+// swagger:model BatchUpdateStatusRequest
+type BatchUpdateStatusRequest struct {
+	// 文章ID列表
+	IDs []uint `json:"ids" binding:"required,min=1"`
+
+	// 状态 1:草稿 2:已发布 3:待审核
+	Status int `json:"status" binding:"required,oneof=1 2 3"`
 }

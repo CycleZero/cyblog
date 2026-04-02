@@ -1,35 +1,76 @@
 <template>
-  <footer class="relative bg-gradient-to-r from-gray-900 via-sky-900 to-gray-900 text-white py-16 mt-20">
-    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="text-center">
-        <div class="text-3xl font-bold bg-gradient-to-r from-sky-300 to-cyan-300 bg-clip-text text-transparent mb-4">
-          🌊 Cyblog
-        </div>
-        <p class="text-gray-400 mb-6">
-          用心分享，每一篇文章都是一份礼物 🎁
-        </p>
-        <div class="flex justify-center gap-4 mb-8">
-          <router-link to="/" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-            🏠
-          </router-link>
-          <router-link to="/article" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-            📝
-          </router-link>
-          <router-link to="/category" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-            🏷️
-          </router-link>
-        </div>
-        <div class="border-t border-white/10 pt-8">
-          <p class="text-gray-500">
-            © 2026 Cyblog. Made with 💖 and ☕
+  <footer class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- 关于 -->
+        <div>
+          <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+            <span class="text-2xl">🌊</span>
+            Cyblog
+          </h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            一个简洁优雅的博客系统，使用 Go 和 Vue3 构建。分享技术，记录生活。
           </p>
         </div>
+
+        <!-- 快速链接 -->
+        <div>
+          <h3 class="text-lg font-bold mb-4">快速链接</h3>
+          <ul class="space-y-2">
+            <li>
+              <router-link to="/" class="text-gray-400 hover:text-white transition-colors text-sm">
+                首页
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/article" class="text-gray-400 hover:text-white transition-colors text-sm">
+                文章列表
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/about" class="text-gray-400 hover:text-white transition-colors text-sm">
+                关于我们
+              </router-link>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 联系 -->
+        <div>
+          <h3 class="text-lg font-bold mb-4">联系我们</h3>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li class="flex items-center gap-2">
+              <span>📧</span>
+              <span>contact@cyblog.com</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span>🌐</span>
+              <span>www.cyblog.com</span>
+            </li>
+          </ul>
+          <div class="flex gap-4 mt-4">
+            <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <span>📱</span>
+            </a>
+            <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <span>📧</span>
+            </a>
+            <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+              <span>🐙</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-500 text-sm">
+        <p>© 2024 Cyblog. 使用 ❤️ 和 ☕ 构建</p>
       </div>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
-// Footer 组件无需额外逻辑
+defineOptions({
+  name: 'Footer',
+})
 </script>

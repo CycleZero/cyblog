@@ -5,6 +5,7 @@ import (
 	"cyblog/pkg/errs"
 	"cyblog/pkg/log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -154,4 +155,101 @@ func (s *UserService) UpdateUser(c *gin.Context) {
 		CreatedAt: updatedUser.CreatedAt.Format(time.DateTime),
 	})
 	return
+}
+
+// AdminList 管理端获取用户列表
+// @Summary 管理端获取用户列表
+// @Description 获取所有用户列表，支持分页，需要管理员权限
+// @Tags 管理-用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param page query int false "页码" default(1)
+// @Param page_size query int false "每页数量" default(10)
+// @Success 200 {object} common.Response{data=AdminListResponse} "获取成功"
+// @Failure 401 {object} common.Response "未授权"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/admin/users [get]
+func (s *UserService) AdminList(c *gin.Context) {
+	var req AdminListRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
+		return
+	}
+	resp, bizErr := s.biz.AdminList(c, &req)
+	if bizErr != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "获取用户列表失败", bizErr))
+		return
+	}
+	common.Success(c, resp)
+}
+
+// UpdateRole 更新用户角色
+// @Summary 更新用户角色
+// @Description 更新指定用户的角色，需要管理员权限
+// @Tags 管理-用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "用户ID"
+// @Param request body UpdateRoleRequest true "更新角色请求参数"
+// @Success 200 {object} common.Response "更新成功"
+// @Failure 400 {object} common.Response "无效的用户ID或参数错误"
+// @Failure 401 {object} common.Response "未授权"
+// @Failure 403 {object} common.Response "无权限"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/admin/users/{id}/role [put]
+func (s *UserService) UpdateRole(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		common.Error(c, errs.New(http.StatusBadRequest, "无效的用户ID"))
+		return
+	}
+	var req UpdateRoleRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
+		return
+	}
+	err = s.biz.UpdateRole(c, uint(id), req.Role)
+	if err != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "更新角色失败", err))
+		return
+	}
+	common.Success(c, nil)
+}
+
+// UpdateStatus 更新用户状态
+// @Summary 更新用户状态
+// @Description 更新指定用户的状态（启用/禁用），需要管理员权限
+// @Tags 管理-用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "用户ID"
+// @Param request body UpdateStatusRequest true "更新状态请求参数"
+// @Success 200 {object} common.Response "更新成功"
+// @Failure 400 {object} common.Response "无效的用户ID或参数错误"
+// @Failure 401 {object} common.Response "未授权"
+// @Failure 403 {object} common.Response "无权限"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/admin/users/{id}/status [put]
+func (s *UserService) UpdateStatus(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		common.Error(c, errs.New(http.StatusBadRequest, "无效的用户ID"))
+		return
+	}
+	var req UpdateStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
+		return
+	}
+	err = s.biz.UpdateStatus(c, uint(id), req.Status)
+	if err != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "更新状态失败", err))
+		return
+	}
+	common.Success(c, nil)
 }

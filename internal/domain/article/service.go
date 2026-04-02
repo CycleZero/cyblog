@@ -111,6 +111,159 @@ func (s *ArticleService) Delete(c *gin.Context) {
 	common.Success(c, nil)
 }
 
+// AdminList 管理端获取文章列表
+// @Summary 管理端获取文章列表
+// @Description 获取所有文章列表，支持分页和筛选，需要管理员权限
+// @Tags 管理-文章
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param keyword query string false "关键词搜索"
+// @Param category_id query int false "分类ID"
+// @Param status query int false "状态" Enums(1, 2, 3)
+// @Param page query int false "页码" default(1)
+// @Param page_size query int false "每页数量" default(10)
+// @Success 200 {object} common.Response{data=ListResponse} "获取成功"
+// @Failure 401 {object} common.Response "未授权"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/admin/articles [get]
+func (s *ArticleService) AdminList(c *gin.Context) {
+	var query ListQuery
+	if err := c.ShouldBindQuery(&query); err != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
+		return
+	}
+	resp, bizErr := s.biz.AdminList(c, &query)
+	if bizErr != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "获取文章列表失败", bizErr))
+		return
+	}
+	common.Success(c, resp)
+}
+
+// SetTop 置顶/取消置顶文章
+// @Summary 置顶/取消置顶文章
+// @Description 设置或取消文章的置顶状态，需要管理员权限
+// @Tags 管理-文章
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "文章ID"
+// @Param request body SetTopRequest true "置顶请求参数"
+// @Success 200 {object} common.Response "设置成功"
+// @Failure 400 {object} common.Response "无效的文章ID或参数错误"
+// @Failure 401 {object} common.Response "未授权"
+// @Failure 403 {object} common.Response "无权限"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/admin/articles/{id}/top [put]
+func (s *ArticleService) SetTop(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		common.Error(c, errs.New(http.StatusBadRequest, "无效的文章ID"))
+		return
+	}
+	var req struct {
+		IsTop bool `json:"is_top"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusBadRequest, "参数错误", err))
+		return
+	}
+	err = s.biz.SetTop(c, uint(id), req.IsTop)
+	if err != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "设置置顶失败", err))
+		return
+	}
+	common.Success(c, nil)
+}
+
+// BatchDelete 批量删除文章
+// @Summary 批量删除文章
+// @Description 批量删除选中的文章，需要管理员权限
+// @Tags 管理-文章
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body BatchDeleteRequest true "批量删除请求参数"
+// @Success 200 {object} common.Response "删除成功"
+// @Failure 400 {object} common.Response "请选择要删除的文章"
+// @Failure 401 {object} common.Response "未授权"
+// @Failure 403 {object} common.Response "无权限"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/admin/articles/batch-delete [post]
+func (s *ArticleService) BatchDelete(c *gin.Context) {
+	var req struct {
+		IDs []uint `json:"ids"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil || len(req.IDs) == 0 {
+		common.Error(c, errs.New(http.StatusBadRequest, "请选择要删除的文章"))
+		return
+	}
+	err := s.biz.BatchDelete(c, req.IDs)
+	if err != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "删除文章失败", err))
+		return
+	}
+	common.Success(c, nil)
+}
+
+// BatchUpdateStatus 批量更新文章状态
+// @Summary 批量更新文章状态
+// @Description 批量更新选中的文章状态（草稿/已发布/待审核），需要管理员权限
+// @Tags 管理-文章
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body BatchUpdateStatusRequest true "批量更新状态请求参数"
+// @Success 200 {object} common.Response "更新成功"
+// @Failure 400 {object} common.Response "参数错误或无效的状态值"
+// @Failure 401 {object} common.Response "未授权"
+// @Failure 403 {object} common.Response "无权限"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/admin/articles/batch-status [put]
+func (s *ArticleService) BatchUpdateStatus(c *gin.Context) {
+	var req struct {
+		IDs    []uint `json:"ids"`
+		Status int    `json:"status"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil || len(req.IDs) == 0 {
+		common.Error(c, errs.New(http.StatusBadRequest, "参数错误"))
+		return
+	}
+	if req.Status != 1 && req.Status != 2 && req.Status != 3 {
+		common.Error(c, errs.New(http.StatusBadRequest, "无效的状态值"))
+		return
+	}
+	err := s.biz.BatchUpdateStatus(c, req.IDs, req.Status)
+	if err != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "更新状态失败", err))
+		return
+	}
+	common.Success(c, nil)
+}
+
+// GetDashboard 获取仪表盘数据
+// @Summary 获取仪表盘数据
+// @Description 获取博客统计数据，包括文章数量、今日浏览量、近期文章、热门文章，需要管理员权限
+// @Tags 管理-仪表盘
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} common.Response{data=DashboardResponse} "获取成功"
+// @Failure 401 {object} common.Response "未授权"
+// @Failure 403 {object} common.Response "无权限"
+// @Failure 500 {object} common.Response "服务器内部错误"
+// @Router /api/admin/dashboard [get]
+func (s *ArticleService) GetDashboard(c *gin.Context) {
+	resp, bizErr := s.biz.GetDashboard(c)
+	if bizErr != nil {
+		common.Error(c, errs.WrapWithMsg(http.StatusInternalServerError, "获取仪表盘数据失败", bizErr))
+		return
+	}
+	common.Success(c, resp)
+}
+
 // GetByID 获取文章详情
 // @Summary 获取文章详情
 // @Description 根据文章ID获取文章详情

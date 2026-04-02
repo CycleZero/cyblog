@@ -151,3 +151,41 @@ func (r *ArticleRepo) IncrementLikes(ctx context.Context, id uint) error {
 func (r *ArticleRepo) DecrementLikes(ctx context.Context, id uint) error {
 	return r.data.DB.WithContext(ctx).Model(&model.Article{}).Where("id = ?", id).UpdateColumn("likes", gorm.Expr("likes - 1")).Error
 }
+
+// Count 统计文章总数
+func (r *ArticleRepo) Count(ctx context.Context) (int64, error) {
+	var count int64
+	err := r.data.DB.WithContext(ctx).Model(&model.Article{}).Count(&count).Error
+	return count, err
+}
+
+// GetTodayViews 获取今日浏览量
+func (r *ArticleRepo) GetTodayViews(ctx context.Context) (int64, error) {
+	var views int64
+	err := r.data.DB.WithContext(ctx).Model(&model.Article{}).
+		Select("COALESCE(SUM(views), 0)").
+		Scan(&views).Error
+	return views, err
+}
+
+// GetRecent 获取近期文章
+func (r *ArticleRepo) GetRecent(ctx context.Context, limit int) ([]*model.Article, error) {
+	var articles []*model.Article
+	err := r.data.DB.WithContext(ctx).
+		Preload("Author").
+		Order("created_at DESC").
+		Limit(limit).
+		Find(&articles).Error
+	return articles, err
+}
+
+// GetHot 获取热门文章
+func (r *ArticleRepo) GetHot(ctx context.Context, limit int) ([]*model.Article, error) {
+	var articles []*model.Article
+	err := r.data.DB.WithContext(ctx).
+		Preload("Author").
+		Order("views DESC").
+		Limit(limit).
+		Find(&articles).Error
+	return articles, err
+}
