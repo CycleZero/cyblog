@@ -146,6 +146,9 @@ type Response struct {
 	// 别名
 	Slug string `json:"slug"`
 
+	// 内容（Markdown格式）
+	Content string `json:"content"`
+
 	// 摘要
 	Summary string `json:"summary"`
 

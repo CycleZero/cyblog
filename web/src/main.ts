@@ -9,6 +9,9 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
 
+// 初始化 Markdown 编辑器
+import './plugins/markdown-editor'
+
 const app = createApp(App)
 
 app.use(createPinia())

@@ -87,28 +87,24 @@ func (biz *ArticleBiz) Create(ctx context.Context, req *CreateRequest) (*Respons
 		}
 	}
 
-	// Markdown转HTML（临时简单实现，后续可替换为专业markdown库）
-	htmlContent := fmt.Sprintf("<p>%s</p>", strings.ReplaceAll(req.Content, "\n", "<br>"))
-
 	// 自动生成摘要
 	summary := req.Summary
 	if summary == "" && len(req.Content) > 200 {
 		summary = string([]rune(req.Content)[:200]) + "..."
 	}
 
-	// 创建文章
+	// 创建文章（直接存储 Markdown 内容，前端负责渲染）
 	article := &model.Article{
-		Title:       req.Title,
-		Slug:        slug,
-		Content:     req.Content,
-		HtmlContent: htmlContent,
-		Summary:     summary,
-		CoverImage:  req.CoverImage,
-		Status:      req.Status,
-		IsTop:       req.IsTop,
-		IsOriginal:  req.IsOriginal,
-		AuthorID:    userID,
-		CategoryID:  req.CategoryID,
+		Title:      req.Title,
+		Slug:       slug,
+		Content:    req.Content,
+		Summary:    summary,
+		CoverImage: req.CoverImage,
+		Status:     req.Status,
+		IsTop:      req.IsTop,
+		IsOriginal: req.IsOriginal,
+		AuthorID:   userID,
+		CategoryID: req.CategoryID,
 	}
 
 	err = biz.articleRepo.Create(ctx, article)
@@ -192,10 +188,6 @@ func (biz *ArticleBiz) Update(ctx context.Context, req *UpdateRequest) (*Respons
 	}
 	if req.Content != "" {
 		article.Content = req.Content
-		// 重新转换HTML（临时简单实现）
-		htmlContent := fmt.Sprintf("<p>%s</p>", strings.ReplaceAll(req.Content, "\n", "<br>"))
-		article.HtmlContent = htmlContent
-
 		// 重新生成摘要
 		if req.Summary == "" && len(req.Content) > 200 {
 			article.Summary = string([]rune(req.Content)[:200]) + "..."
@@ -432,6 +424,7 @@ func convertToResponse(article *model.Article) *Response {
 		ID:         article.ID,
 		Title:      article.Title,
 		Slug:       article.Slug,
+		Content:    article.Content,
 		Summary:    article.Summary,
 		CoverImage: article.CoverImage,
 		Status:     article.Status,

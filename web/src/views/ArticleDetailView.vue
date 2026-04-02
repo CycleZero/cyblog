@@ -91,7 +91,7 @@
     <!-- Article Body -->
     <article class="bg-white rounded-2xl shadow-soft p-8 mb-8">
       <div class="prose prose-lg max-w-none">
-        <div v-html="article.content" class="article-content"></div>
+        <div v-html="renderedContent" class="article-content"></div>
       </div>
     </article>
 
@@ -183,8 +183,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { marked } from 'marked'
 import { getArticle, likeArticle, unlikeArticle } from '@/api/article'
 import type { Article } from '@/api/types'
 
@@ -193,6 +194,18 @@ const article = ref<Article | null>(null)
 const loading = ref(true)
 const isLiked = ref(false)
 const relatedArticles = ref<Article[]>([])
+
+// 配置 marked
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+})
+
+// 将 Markdown 转换为 HTML
+const renderedContent = computed(() => {
+  if (!article.value?.content) return ''
+  return marked(article.value.content)
+})
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)

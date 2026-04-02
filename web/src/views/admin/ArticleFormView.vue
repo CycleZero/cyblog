@@ -24,12 +24,11 @@
             placeholder="请输入文章摘要"
           />
         </el-form-item>
-        <el-form-item label="内容" prop="content">
-          <el-input
+        <el-form-item label="内容" prop="content" class="content-editor-item">
+          <MarkdownEditor
             v-model="form.content"
-            type="textarea"
-            :rows="15"
-            placeholder="请输入文章内容"
+            height="500px"
+            placeholder="请输入文章内容，支持 Markdown 语法..."
           />
         </el-form-item>
         <el-form-item label="分类" prop="categoryId">
@@ -84,6 +83,7 @@ import { getArticle, createArticle as createArticleApi, updateArticle as updateA
 import { getCategories } from '@/api/category'
 import { getTags } from '@/api/tag'
 import type { Article, Category, Tag } from '@/api/types'
+import MarkdownEditor from '@/components/common/MarkdownEditor.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -207,5 +207,15 @@ onMounted(() => {
 <style scoped>
 .article-form {
   padding: 0;
+}
+
+:deep(.content-editor-item) {
+  display: block;
+  width: 100%;
+}
+
+:deep(.content-editor-item .el-form-item__content) {
+  width: 100%;
+  display: block;
 }
 </style>
