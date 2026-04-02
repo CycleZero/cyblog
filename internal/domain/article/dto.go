@@ -98,28 +98,28 @@ type ListQuery struct {
 	dto.PageParam
 
 	// 关键词
-	Keyword string `form:"keyword"`
+	Keyword string `form:"keyword" query:"keyword"`
 
 	// 分类ID
-	CategoryID uint `form:"category_id"`
+	CategoryID uint `form:"category_id" query:"category_id"`
 
 	// 标签ID
-	TagID uint `form:"tag_id"`
+	TagID uint `form:"tag_id" query:"tag_id"`
 
 	// 状态
-	Status int `form:"status"`
+	Status int `form:"status" query:"status"`
 
 	// 作者ID
-	AuthorID uint `form:"author_id"`
+	AuthorID uint `form:"author_id" query:"author_id"`
 
 	// 是否置顶
-	IsTop *bool `form:"is_top"`
+	IsTop *bool `form:"is_top" query:"is_top"`
 
 	// 排序字段
-	SortBy string `form:"sort_by,default=created_at"`
+	SortBy string `form:"sort_by,default=created_at" query:"sort_by"`
 
 	// 排序方式
-	SortOrder string `form:"sort_order,default=desc"`
+	SortOrder string `form:"sort_order,default=desc" query:"sort_order"`
 }
 
 // Getter方法供Repo层动态查询使用

@@ -4,10 +4,10 @@ package dto
 // swagger:model PageParam
 type PageParam struct {
 	// 页码
-	Page int `json:"page" uri:"page" binding:"page"`
+	Page int `json:"page" uri:"page" query:"page"`
 
 	// 每页数量
-	PageSize int `json:"page_size" uri:"page_size" binding:"page_size"`
+	PageSize int `json:"page_size" uri:"page_size" query:"page_size"`
 }
 
 // PageInfo 请求结果分页信息
