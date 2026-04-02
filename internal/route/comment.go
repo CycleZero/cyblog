@@ -32,10 +32,4 @@ func RegisterCommentRoutes(api gin.IRouter, commentService *comment.CommentServi
 		articleGroup.GET("/:id/comment-count", commentService.GetCommentCount)
 	}
 
-	// 管理端路由
-	adminGroup := api.Group("/admin/comments", middlewire.AuthMiddleWire(true))
-	{
-		adminGroup.GET("", commentService.AdminList)
-		adminGroup.DELETE("/:id", commentService.AdminDelete)
-	}
 }
